@@ -9,6 +9,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'image.api.playstation.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'agst.prod.dl.playstation.net',
+      },
     ],
   },
   async headers() {

@@ -22,6 +22,8 @@ type GameContextType = {
   >;
   handlePressR1: () => void;
   handlePressL1: () => void;
+  username: string;
+  handleSetUsername: (value: string) => void;
 };
 
 type GameProviderProps = {
@@ -33,6 +35,7 @@ export const GameContext = createContext<GameContextType>(
 );
 
 export const GameProvider = ({ children }: GameProviderProps) => {
+  const [username, setUsername] = useState<string>("tikao_lo");
   const [gameSelected, setGameSelected] = useState<number>(0);
   const [menuSelected, setMenuSelected] = useState<number>(1);
   const [gameList, setGameList] = useState<GameDataResponse[]>([]);
@@ -62,6 +65,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   }, [gameSelected]);
 
+  const handleSetUsername = useCallback((value: string) => {
+    setUsername(value);
+    localStorage.setItem("username", value);
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -75,6 +83,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         setPlatinumGamesList,
         handlePressR1,
         handlePressL1,
+        username,
+        handleSetUsername,
       }}
     >
       {children}

@@ -3,7 +3,7 @@ import * as psn from "psn-api";
 
 export default async function GET(req: NextApiRequest, res: NextApiResponse) {
   const PSN_NPSSO_TOKEN =
-    "uKgAcxmBJp1yTDM3PRU9tmPKCvJ22hsBu2s3SOfMouEJp1f7gUzECr9aNUZQUZVW";
+    "xa54azCCHh6DTpEU5kYfFGOA5QL4yatb8dqzD2nXDKcOOXOvuNS8c3Q3z884AwoK";
 
   const accessCode = await psn.exchangeNpssoForCode(PSN_NPSSO_TOKEN);
   const authorization = await psn.exchangeCodeForAccessToken(accessCode);

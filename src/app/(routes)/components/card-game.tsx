@@ -66,6 +66,7 @@ export function CardGame() {
                   alt="game"
                   width={index === gameSelected ? 288 : 256}
                   height={index === gameSelected ? 288 : 256}
+                  
                 />
               </div>
             ))

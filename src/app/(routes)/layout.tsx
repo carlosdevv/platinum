@@ -1,8 +1,9 @@
 import { TailwindIndicator } from "@/components/TailwindIndicator";
 import { cn } from "@/lib/utils";
-import '@/styles/globals.css';
+import "@/styles/globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { Providers } from "../providers";
+import { DialogHasUser } from "@/components/DialogHasUser";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body className="min-h-screen">
         <Providers>
+          <DialogHasUser />
           {children}
           <TailwindIndicator />
         </Providers>

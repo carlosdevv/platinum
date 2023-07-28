@@ -2,23 +2,22 @@
 
 import { useGetProfileData } from "@/app/(services)/profile/useProfileService";
 import { Icons } from "@/components/Icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Skeleton } from "../ui/skeleton";
+import { HeaderSettings } from "./header-settings";
 import { TrophyInfo } from "./trophy-info";
+import { useGameContext } from "@/context/useGameContext";
 
 export function Header() {
-  const userName = "tikao_lo";
-  const { data: profileProps, isLoading } = useGetProfileData(userName, {
+  const { username } = useGameContext();
+  const { data: profileProps, isLoading } = useGetProfileData(username, {
     cacheTime: 1000 * 60 * 60, // 1 hour
     refetchInterval: 1000 * 60 * 60, // 1 hour
-    refetchOnMount: false,
-    enabled: !!userName,
+    enabled: username !== "",
   });
 
   function getCurrentHour() {
@@ -32,23 +31,18 @@ export function Header() {
   return (
     <section className="w-full max-w-screen-2xl h-16 p-4 flex items-center mx-auto justify-between">
       <div className="flex items-center gap-2">
-        <Avatar>
-          <AvatarImage src={profileProps?.avatarUrl} alt="profilePic" />
-          <AvatarFallback>
-            <Skeleton className="h-10 w-10 rounded-full" />
-          </AvatarFallback>
-        </Avatar>
+        <HeaderSettings avatar={profileProps?.avatarUrl} />
         <HoverCard>
           <HoverCardTrigger asChild>
             <Button variant="link" className="text-white">
-              @{userName}
+              @{username}
             </Button>
           </HoverCardTrigger>
           {profileProps?.aboutMe && (
             <HoverCardContent className="w-80">
               <div className="flex flex-col justify-between space-x-4">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold">@{userName}</h4>
+                  <h4 className="text-sm font-semibold">@{username}</h4>
                   <p className="text-sm">{profileProps?.aboutMe}</p>
                 </div>
               </div>
