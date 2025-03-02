@@ -1,13 +1,18 @@
+import Footer from "@/components/footer";
 import { Header } from "@/components/header";
 import { HomeContent } from "@/components/home-content";
-import { UserNameModal } from "@/components/modals/username-modal";
+import { AddGameModal } from "@/components/modals/add-game-modal";
+
 export default function Home() {
   return (
     <>
-      <UserNameModal />
-      <main className="w-screen h-screen flex-col bg-gradient-to-r from-[#0F2027] to-[#10101E]">
+      <AddGameModal />
+      <main className="w-screen h-screen flex flex-col bg-gradient-to-r from-[#0F2027] to-[#10101E] relative overflow-hidden">
         <Header />
-        <HomeContent />
+        <div className="flex-1 overflow-hidden">
+          <HomeContent />
+        </div>
+        <Footer />
       </main>
     </>
   );

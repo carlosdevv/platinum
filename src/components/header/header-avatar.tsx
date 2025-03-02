@@ -17,17 +17,17 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
 export function HeaderAvatar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  console.log(session?.user.image);
+  const isLoading = status === "loading";
 
   return (
     <>
       <Dialog>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger className="flex items-center gap-2">
             <Avatar className="cursor-pointer">
-              {session?.user?.image ? (
+              {!isLoading && session?.user?.image ? (
                 <Image
                   src={session.user.image}
                   alt={session.user.name || "Avatar"}
@@ -43,6 +43,16 @@ export function HeaderAvatar() {
                 </AvatarFallback>
               )}
             </Avatar>
+            {!isLoading && (
+              <div className="flex flex-col gap-y-1">
+                <span className="text-white text-xs font-semibold">
+                  {session?.user?.name?.split(" ")[0] +
+                    " " +
+                    session?.user?.name?.split(" ")[1]}
+                </span>
+                <Icons.EllipsisHorizontal className="text-white p-1 rounded-full bg-gray-700 size-5" />
+              </div>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent className="">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>

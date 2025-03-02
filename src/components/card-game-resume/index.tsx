@@ -4,21 +4,14 @@ import Image from "next/image";
 
 type CardGameResumeProps = Pick<
   FetchPsnGamesResponse,
-  | "name"
-  | "progress"
-  | "totalTrophies"
-  | "earnedTrophies"
-  | "lastPlayed"
-  | "hasPlatinum"
+  "name" | "progress" | "lastPlayed" | "platform"
 >;
 
 export function CardGameResume({
   name,
   progress,
-  totalTrophies,
-  earnedTrophies,
   lastPlayed,
-  hasPlatinum,
+  platform,
 }: CardGameResumeProps) {
   function convertTimePlayed(time: number) {
     const date = new Date(time);
@@ -36,10 +29,11 @@ export function CardGameResume({
   return (
     <div className="flex flex-col mt-10">
       <div className="flex items-center gap-4">
-        {hasPlatinum && (
-          <Image src={platinumTrophy} alt="trophy" width={32} height={32} />
-        )}
+        <Image src={platinumTrophy} alt="trophy" width={32} height={32} />
         <h1 className="text-5xl font-light text-white">{name}</h1>
+        <span className="bg-white text-background text-sm font-semibold rounded-md px-2 py-0.5">
+          {platform.includes("Steam") ? "PC" : "PS5"}
+        </span>
       </div>
       <div className="mt-8 grid-cols-3 w-auto gap-16 flex items-center">
         <div className="flex flex-col gap-2">
@@ -51,12 +45,6 @@ export function CardGameResume({
         <div className="flex flex-col gap-2">
           <span className="text-slate-300 text-xs">Progress</span>
           <span className="text-white text-4xl">{progress || 0}%</span>
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="text-slate-300 text-xs">Trophies</span>
-          <span className="text-white text-4xl">
-            {earnedTrophies || 0}/{totalTrophies || 0}
-          </span>
         </div>
       </div>
     </div>

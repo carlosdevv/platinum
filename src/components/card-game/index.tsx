@@ -15,8 +15,12 @@ import Image from "next/image";
 import { useEffect } from "react";
 
 export function CardGame() {
-  const { gameSelected, handleShowListOption, isLoadingPsnGames } =
-    useGameContext();
+  const {
+    gameSelected,
+    handleShowListOption,
+    isLoadingPsnGames,
+    isLoadingSteamGames,
+  } = useGameContext();
   const { api, setApi } = useCarousel();
 
   useEffect(() => {
@@ -29,7 +33,7 @@ export function CardGame() {
     <section className="mt-10 flex flex-col">
       <Carousel className="w-full" setApi={setApi}>
         <CarouselContent className="">
-          {isLoadingPsnGames ? (
+          {isLoadingPsnGames || isLoadingSteamGames ? (
             <SkeletonGameList />
           ) : (
             handleShowListOption().map((item, index) => (
@@ -40,7 +44,7 @@ export function CardGame() {
                 <div
                   className={cn(
                     "relative size-64 p-1 rounded-2xl transition-all duration-300",
-                    index === gameSelected && item.hasPlatinum
+                    index === gameSelected
                       ? "border-4 border-[#3557BD]"
                       : "border-[#F2FEF5] border-opacity-10"
                   )}
@@ -60,16 +64,14 @@ export function CardGame() {
         </CarouselContent>
       </Carousel>
 
-      {isLoadingPsnGames ? (
+      {isLoadingPsnGames || isLoadingSteamGames ? (
         <SkeletonCardGameResume />
       ) : (
         <CardGameResume
           progress={handleShowListOption()[gameSelected]?.progress}
           name={handleShowListOption()[gameSelected]?.name}
-          totalTrophies={handleShowListOption()[gameSelected]?.totalTrophies}
-          earnedTrophies={handleShowListOption()[gameSelected]?.earnedTrophies}
           lastPlayed={handleShowListOption()[gameSelected]?.lastPlayed}
-          hasPlatinum={handleShowListOption()[gameSelected]?.hasPlatinum}
+          platform={handleShowListOption()[gameSelected]?.platform}
         />
       )}
     </section>

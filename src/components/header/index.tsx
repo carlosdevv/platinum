@@ -14,12 +14,12 @@ export function Header() {
   return (
     <section className="w-full max-w-screen-2xl h-16 p-4 flex items-center mx-auto justify-between">
       <div className="flex items-center gap-x-2">
-        <HeaderAvatar />
+        <Icons.Wifi className="text-white size-5" />
+        <h3 className="text-white font-semibold">{getCurrentHour()}</h3>
       </div>
       <TrophyInfo />
-      <div className="flex items-center gap-4">
-        <Icons.Wifi className="text-white" />
-        <h3 className="text-white font-light">{getCurrentHour()}</h3>
+      <div className="flex items-center gap-x-2">
+        <HeaderAvatar />
       </div>
     </section>
   );

@@ -6,6 +6,7 @@ import {
   ThemeProvider as NextThemesProvider,
   type ThemeProviderProps,
 } from "next-themes";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { QueryClient, QueryClientProvider } from "react-query";
 
 interface Props {
@@ -24,16 +25,18 @@ const queryClient = new QueryClient({
 const Providers = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
-          <GameProvider>{children}</GameProvider>
-        </SessionProvider>
-      </ThemeProvider>
+      <NuqsAdapter>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+            <GameProvider>{children}</GameProvider>
+          </SessionProvider>
+        </ThemeProvider>
+      </NuqsAdapter>
     </QueryClientProvider>
   );
 };

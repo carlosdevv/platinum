@@ -6,14 +6,15 @@ import { useGameContext } from "@/context/useGameContext";
 import Image from "next/image";
 
 export function TrophyInfo() {
-  const { psnPlatinumGames, isLoadingPsnGames } = useGameContext();
+  const { platinumGames, isLoadingPsnGames, isLoadingSteamGames } =
+    useGameContext();
 
   return (
     <>
-      {isLoadingPsnGames ? (
+      {isLoadingPsnGames || isLoadingSteamGames ? (
         <SkeletonTrophies />
       ) : (
-        psnPlatinumGames && (
+        platinumGames && (
           <div className="flex items-center gap-4">
             <div className="flex items-end gap-2">
               <Image
@@ -23,7 +24,7 @@ export function TrophyInfo() {
                 height={20}
               />
               <h4 className="text-white font-semibold">
-                {psnPlatinumGames.length}
+                {platinumGames.length}
               </h4>
             </div>
           </div>

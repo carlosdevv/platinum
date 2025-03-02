@@ -4,6 +4,7 @@ import platinumTrophy from "@/assets/icons/platina-trophy.svg";
 import silverTrophy from "@/assets/icons/silver-trophy.svg";
 import {
   ChromeIcon,
+  EllipsisIcon,
   Home,
   LogOutIcon,
   LucideIcon,
@@ -22,6 +23,7 @@ export const Icons = {
   Square,
   SignOut: LogOutIcon,
   Google: ChromeIcon,
+  EllipsisHorizontal: EllipsisIcon,
 };
 
 export { bronzeTrophy, goldTrophy, platinumTrophy, silverTrophy };
