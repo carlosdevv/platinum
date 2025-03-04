@@ -47,7 +47,6 @@
     "node-cache": "^5.1.2",
     "nuqs": "^2.4.0",
     "postcss": "^8.4.35",
-    "prisma": "^6.4.1",
     "psn-api": "^2.11.0",
     "react": "19.0.0",
     "react-aria-components": "^1.6.0",
@@ -65,7 +64,8 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16"
+    "@tailwindcss/typography": "^0.5.16",
+    "prisma": "^6.4.1"
   },
   "eslintConfig": {
     "extends": [
