@@ -10,4 +10,14 @@ export const menuItens: MenuItensProps[] = [
     name: "Platinum",
     isSelected: true,
   },
+  {
+    id: 2,
+    name: "PS5",
+    isSelected: false,
+  },
+  {
+    id: 3,
+    name: "PC",
+    isSelected: false,
+  },
 ];

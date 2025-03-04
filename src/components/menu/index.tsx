@@ -36,8 +36,8 @@ export function Menu() {
     setGameSelected(0);
   }
 
-  const pressL1 = useKeyPress("q"); // Simulando o botão L1
-  const pressR1 = useKeyPress("e"); // Simulando o botão R1
+  const pressL1 = useKeyPress("q");
+  const pressR1 = useKeyPress("e");
 
   const games = handleShowListOption();
 

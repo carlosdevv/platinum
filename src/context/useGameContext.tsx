@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type DatabaseGameResponse,
   type FetchPsnGamesResponse,
   type FetchSteamGamesResponse,
 } from "@/services/game/types";
@@ -8,7 +9,13 @@ import {
   useFetchPsnGames,
   useFetchSteamGames,
 } from "@/services/game/useGameService";
-import { ReactNode, createContext, useContext, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 enum MenuOptions {
   PLATINUM = 1,
@@ -23,15 +30,17 @@ interface GameContextType {
   handlePressR1: () => void;
   isLoadingPsnGames: boolean;
   isLoadingSteamGames: boolean;
+  isLoadingDbGames: boolean;
   psnGames: FetchPsnGamesResponse[];
   platinumGames: FetchPsnGamesResponse[];
   steamGames: FetchSteamGamesResponse[];
+  dbGames: DatabaseGameResponse[];
   menuSelected: number;
   setMenuSelected: React.Dispatch<React.SetStateAction<number>>;
   handleShowListOption: () =>
     | FetchPsnGamesResponse[]
-    | FetchSteamGamesResponse[];
-  shufflePlatinumGames: () => void;
+    | FetchSteamGamesResponse[]
+    | DatabaseGameResponse[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -39,9 +48,8 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export function GameProvider({ children }: { children: ReactNode }) {
   const [gameSelected, setGameSelected] = useState(0);
   const [menuSelected, setMenuSelected] = useState(1);
-  const [shuffledPlatinumGames, setShuffledPlatinumGames] = useState<
-    FetchPsnGamesResponse[]
-  >([]);
+  const [dbGames, setDbGames] = useState<DatabaseGameResponse[]>([]);
+  const [isLoadingDbGames, setIsLoadingDbGames] = useState(true);
 
   const { data: psnGames = [], isLoading: isLoadingPsnGames } =
     useFetchPsnGames({
@@ -56,6 +64,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
     );
 
+  // Função para buscar jogos do banco de dados
+  const fetchDbGames = async () => {
+    setIsLoadingDbGames(true);
+    try {
+      const response = await fetch("/api/games");
+      if (!response.ok) {
+        throw new Error("Failed to fetch games from database");
+      }
+      const data = await response.json();
+      setDbGames(data);
+    } catch (error) {
+      console.error("Error fetching games from database:", error);
+    } finally {
+      setIsLoadingDbGames(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDbGames();
+  }, []);
+
   const platinumGames = psnGames
     .filter((game) => game.hasPlatinum)
     .concat(
@@ -69,17 +98,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
         lastPlayed: game.lastPlayed,
         platform: game.platform,
       }))
+    )
+    .concat(
+      dbGames.map((game) => ({
+        lastPlayed: game.lastPlayed,
+        iconUrl: game.iconUrl,
+        name: game.name,
+        platform: game.platform,
+        hasPlatinum: game.hasPlatinum,
+      }))
     );
 
-  const shufflePlatinumGames = () => {
-    const shuffled = [...platinumGames];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    setShuffledPlatinumGames(shuffled);
-    setGameSelected(0);
-  };
+  const ps5Games = psnGames.concat(
+    dbGames.filter((game) => game.platform === "PS5")
+  );
+
+  const pcGames = steamGames.concat(
+    dbGames.filter((game) => game.platform === "PC")
+  );
 
   const handlePressL1 = () => {
     const games = handleShowListOption();
@@ -93,12 +129,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const handleShowListOption = () => {
     const listOption = {
-      [Number(MenuOptions.PLATINUM)]:
-        shuffledPlatinumGames.length > 0
-          ? shuffledPlatinumGames
-          : platinumGames,
-      [Number(MenuOptions.PS5)]: psnGames,
-      [Number(MenuOptions.STEAM)]: steamGames,
+      [Number(MenuOptions.PLATINUM)]: platinumGames,
+      [Number(MenuOptions.PS5)]: ps5Games,
+      [Number(MenuOptions.STEAM)]: pcGames,
     };
 
     return listOption[menuSelected];
@@ -112,6 +145,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         handlePressL1,
         handlePressR1,
         isLoadingPsnGames,
+        isLoadingDbGames,
         psnGames,
         platinumGames,
         menuSelected,
@@ -119,7 +153,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         handleShowListOption,
         isLoadingSteamGames,
         steamGames,
-        shufflePlatinumGames,
+        dbGames,
       }}
     >
       {children}

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   const cacheKey = `steam-games-${steamUserId}`;
-  const cachedData = await getCachedData(cacheKey);
+  const cachedData = getCachedData(cacheKey);
 
   if (cachedData) {
     console.log(`Returning cached data for ${steamUserId}`);
@@ -157,7 +157,8 @@ export async function GET(request: NextRequest) {
 
     // Filtrar apenas jogos completados (100% das conquistas)
     const completedGames = gamesWithAchievements.filter(
-      (game) => game.isCompleted && game.totalAchievements > 0
+      (game) =>
+        game.isCompleted && game.totalAchievements && game.totalAchievements > 0
     );
 
     console.log(
@@ -166,7 +167,7 @@ export async function GET(request: NextRequest) {
 
     // Armazenar no cache apenas se encontrou jogos
     if (completedGames.length > 0) {
-      await setCachedData(cacheKey, completedGames);
+      setCachedData(cacheKey, completedGames);
     }
 
     return NextResponse.json({

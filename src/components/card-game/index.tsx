@@ -68,7 +68,6 @@ export function CardGame() {
         <SkeletonCardGameResume />
       ) : (
         <CardGameResume
-          progress={handleShowListOption()[gameSelected]?.progress}
           name={handleShowListOption()[gameSelected]?.name}
           lastPlayed={handleShowListOption()[gameSelected]?.lastPlayed}
           platform={handleShowListOption()[gameSelected]?.platform}
