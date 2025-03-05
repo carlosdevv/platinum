@@ -7,7 +7,7 @@ export type MenuItensProps = {
 export const menuItens: MenuItensProps[] = [
   {
     id: 1,
-    name: "Platinum",
+    name: "All",
     isSelected: true,
   },
   {

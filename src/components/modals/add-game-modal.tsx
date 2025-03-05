@@ -11,13 +11,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { SelectNative } from "@/components/ui/select-native";
 import { useFetchSteamGameDetails } from "@/services/game/useGameService";
@@ -28,22 +36,17 @@ import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
 
 const schema = z.object({
   name: z.string().min(1, {
     message: "Please select a game to display.",
   }),
-  platform: z.string().min(1, {
-    message: "Please select a platform to display.",
-  }),
+  platform: z
+    .string()
+    .min(1, {
+      message: "Please select a platform to display.",
+    })
+    .default("PC"),
   iconUrl: z.string().min(1, {
     message: "Please select a game to display.",
   }),
@@ -208,7 +211,10 @@ export function AddGameModal() {
                             className="w-full"
                             disabled={
                               isLoading ||
-                              (gameSearchResults && gameSearchResults.total < 1)
+                              (gameSearchResults &&
+                                gameSearchResults.total < 1) ||
+                              !form.getValues("name") ||
+                              !gameSearchResults
                             }
                           >
                             <SelectValue placeholder="Select the game" />
