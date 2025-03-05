@@ -12,6 +12,7 @@ import {
   LucideIcon,
   SearchIcon,
   Square,
+  TrashIcon,
   Trophy,
   Wifi,
   X,
@@ -32,6 +33,7 @@ export const Icons = {
   Loader: Loader2Icon,
   CheckCircle: CheckCircle2Icon,
   XCircle: XCircleIcon,
+  Remove: TrashIcon,
 };
 
 export { bronzeTrophy, goldTrophy, platinumTrophy, silverTrophy };

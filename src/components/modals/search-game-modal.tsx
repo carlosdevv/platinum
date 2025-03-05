@@ -1,5 +1,6 @@
 "use client";
 
+import { removeGame } from "@/actions/remove-game";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,20 +16,45 @@ import { Label } from "@/components/ui/label";
 import { useGameContext } from "@/context/useGameContext";
 import type { FetchPsnGamesResponse } from "@/services/game/types";
 import { format } from "date-fns";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function SearchGameModal() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const { platinumGames } = useGameContext();
+  const { platinumGames, dbGames } = useGameContext();
+  const { data } = useSession();
 
   const [open, setOpen] = useState(false);
   const [isFoundGame, setIsFoundGame] = useState<
     FetchPsnGamesResponse | undefined | null
   >();
+  const [isRemovingGame, setIsRemovingGame] = useState(false);
+
+  const handleRemoveGame = async (gameName: string) => {
+    const userId = data?.user.id;
+
+    if (!userId) {
+      toast.error("Please login to remove a game.");
+      return;
+    }
+
+    setIsRemovingGame(true);
+
+    try {
+      await removeGame({ name: gameName, userId });
+      toast.success("Game removed successfully.");
+      onClose();
+    } catch (error) {
+      toast.error("Failed to remove game.");
+    } finally {
+      setIsRemovingGame(false);
+    }
+  };
 
   const handleSearchGame = (gameName: string) => {
     if (gameName === "") {
@@ -74,7 +100,7 @@ export function SearchGameModal() {
         }
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Search Game</DialogTitle>
           <DialogDescription>Search a game of your library.</DialogDescription>
@@ -114,6 +140,18 @@ export function SearchGameModal() {
                 <span className="text-gray-500">
                   {format(isFoundGame.lastPlayed, "dd/MM/yyyy")}
                 </span>
+                {dbGames.some((game) => game.name === isFoundGame.name) &&
+                  (isRemovingGame ? (
+                    <Icons.Loader className="size-4 animate-spin" />
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleRemoveGame(isFoundGame.name)}
+                    >
+                      <Icons.Remove className="text-rose-500 size-4" />
+                    </Button>
+                  ))}
               </div>
               <div className="flex items-center gap-x-2">
                 <Label htmlFor="name" className="line-clamp-1">
@@ -134,7 +172,9 @@ export function SearchGameModal() {
           )}
         </div>
         <DialogFooter>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose} disabled={isRemovingGame}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

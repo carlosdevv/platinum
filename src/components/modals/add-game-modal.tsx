@@ -74,6 +74,11 @@ export function AddGameModal() {
       return;
     }
 
+    if (!gameSelected) {
+      toast.error("Please select a game.");
+      return;
+    }
+
     setLoading(true);
     try {
       const userId = data?.user.id;
@@ -82,7 +87,6 @@ export function AddGameModal() {
         toast.error("Please login to add a game.");
         return;
       }
-
 
       await addGame({
         name: formValues.name,
