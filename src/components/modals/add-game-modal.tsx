@@ -226,6 +226,7 @@ export function AddGameModal() {
                               <SelectItem
                                 key={game.iconUrl}
                                 value={game.iconUrl || ""}
+                                onClick={() => form.setValue("name", game.name)}
                               >
                                 {game.name}
                               </SelectItem>
