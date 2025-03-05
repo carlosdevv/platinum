@@ -1,4 +1,5 @@
 import { TailwindIndicator } from "@/components/TailwindIndicator";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/providers/app-providers";
 import { Inter as FontSans } from "next/font/google";
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     >
       <head />
       <body className="min-h-screen">
+        <Toaster />
         <Providers>
           {children}
           <TailwindIndicator />
