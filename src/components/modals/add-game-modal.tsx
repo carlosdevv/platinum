@@ -134,6 +134,17 @@ export function AddGameModal() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (gameSearchResults && gameSearchResults.total > 0) {
+      form.setValue(
+        "name",
+        gameSearchResults.results.find(
+          (game) => game.iconUrl === form.getValues("iconUrl")
+        )?.name || ""
+      );
+    }
+  }, [gameSearchResults, form]);
+
   return (
     <Dialog
       open={open}
@@ -226,7 +237,6 @@ export function AddGameModal() {
                               <SelectItem
                                 key={game.iconUrl}
                                 value={game.iconUrl || ""}
-                                onClick={() => form.setValue("name", game.name)}
                               >
                                 {game.name}
                               </SelectItem>
