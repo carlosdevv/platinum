@@ -29,8 +29,6 @@ export async function addGame(params: AddGameParams) {
       },
     });
 
-    revalidatePath("/");
-
     return game;
   } catch (error) {
     console.error("Error adding game:", error);

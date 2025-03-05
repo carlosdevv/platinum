@@ -3,10 +3,11 @@ import { Header } from "@/components/header";
 import { HomeContent } from "@/components/home-content";
 import { AddGameModal } from "@/components/modals/add-game-modal";
 import { SearchGameModal } from "@/components/modals/search-game-modal";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <AddGameModal />
       <SearchGameModal />
       <main className="w-screen h-screen flex flex-col bg-gradient-to-r from-[#0F2027] to-[#10101E] relative overflow-hidden">
@@ -16,6 +17,6 @@ export default function Home() {
         </div>
         <Footer />
       </main>
-    </>
+    </Suspense>
   );
 }
