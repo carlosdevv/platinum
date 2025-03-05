@@ -103,8 +103,12 @@ export function AddGameModal() {
           return;
         }
 
+        const gameName = gameSearchResults?.results.find(
+          (game) => game.iconUrl === values.iconUrl
+        )?.name;
+
         await addGame({
-          name: values.name,
+          name: gameName || values.name,
           platform: values.platform,
           lastPlayed: new Date(),
           iconUrl: values.iconUrl,
@@ -133,17 +137,6 @@ export function AddGameModal() {
       setOpen(false);
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (gameSearchResults && gameSearchResults.total > 0) {
-      form.setValue(
-        "name",
-        gameSearchResults.results.find(
-          (game) => game.iconUrl === form.getValues("iconUrl")
-        )?.name || ""
-      );
-    }
-  }, [gameSearchResults, form]);
 
   return (
     <Dialog
