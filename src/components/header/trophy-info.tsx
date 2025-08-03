@@ -1,7 +1,8 @@
 "use client";
 
-import { Icons } from "@/components/icons";
+import platinumTrophy from "@/assets/icons/platina-trophy.svg";
 import { useGameContext } from "@/context/useGameContext";
+import Image from "next/image";
 
 export function TrophyInfo() {
   const { isLoadingDbGames, steamGames, dbGames } = useGameContext();
@@ -25,23 +26,30 @@ export function TrophyInfo() {
     );
   }
 
-  // Contar jogos platinados da Steam
-  const steamPlatinumCount = steamGames.filter(game => game.isCompleted).length;
-  
-  // Contar jogos platinados do banco de dados
-  const dbPlatinumCount = dbGames.filter(game => game.hasPlatinum).length;
-  
-  // Total de jogos platinados
+  const steamPlatinumCount = steamGames.filter(
+    (game) => game.isCompleted
+  ).length;
+
+  const dbPlatinumCount = dbGames.filter((game) => game.hasPlatinum).length;
+
   const platinumCount = steamPlatinumCount + dbPlatinumCount;
-  
-  // Contar por plataforma
-  const ps5Count = dbGames.filter((game) => game.platform === "PS5" && game.hasPlatinum).length;
-  const pcCount = steamPlatinumCount + dbGames.filter((game) => game.platform === "PC" && game.hasPlatinum).length;
+
+  const ps5Count = dbGames.filter(
+    (game) => game.platform === "PS5" && game.hasPlatinum
+  ).length;
+  const pcCount =
+    steamPlatinumCount +
+    dbGames.filter((game) => game.platform === "PC" && game.hasPlatinum).length;
 
   return (
     <div className="flex items-center gap-6">
       <div className="flex items-center gap-2">
-        <Icons.Trophy className="text-white size-5 ps5-text-glow" />
+        <Image
+          src={platinumTrophy}
+          alt="Platinum Trophy"
+          width={20}
+          height={20}
+        />
         <span className="text-white ps5-text-glow">{platinumCount}</span>
       </div>
       <div className="flex items-center gap-2">

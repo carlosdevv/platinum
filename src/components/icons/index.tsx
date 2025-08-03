@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 export const Icons = {
+  platinumTrophy,
   SignOut: LogOut,
   Trophy,
   Wifi,
