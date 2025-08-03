@@ -1,6 +1,5 @@
 "use client";
 
-import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
@@ -46,7 +45,6 @@ export default function LoginPage() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-orange-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl" />
               <div className="relative flex items-center justify-center gap-3 h-full w-full bg-gray-900/90 backdrop-blur-md rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
-                <Icons.Google className="size-6 text-white" />
                 <span className="text-white font-medium text-lg">
                   Continue with Google
                 </span>
