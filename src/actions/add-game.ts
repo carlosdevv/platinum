@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/lib/prismadb";
-import { revalidatePath } from "next/cache";
 
 interface AddGameParams {
   name: string;
@@ -9,10 +8,11 @@ interface AddGameParams {
   lastPlayed?: Date;
   userId: string;
   iconUrl: string;
+  hasPlatinum?: boolean;
 }
 
 export async function addGame(params: AddGameParams) {
-  const { name, platform, lastPlayed, userId, iconUrl } = params;
+  const { name, platform, lastPlayed, userId, iconUrl, hasPlatinum = true } = params;
 
   if (!name || !platform) {
     throw new Error("Name and platform are required");
@@ -26,6 +26,7 @@ export async function addGame(params: AddGameParams) {
         lastPlayed,
         userId,
         iconUrl,
+        hasPlatinum,
       },
     });
 

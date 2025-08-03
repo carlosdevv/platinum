@@ -41,16 +41,18 @@ model Account {
 }
 
 model Game {
-  id         String    @id @default(cuid())
-  name       String
-  platform   String
-  lastPlayed DateTime?
-  userId     String
-  iconUrl    String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  name        String
+  platform    String
+  lastPlayed  DateTime?
+  userId      String
+  iconUrl     String?
+  hasPlatinum Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([name, userId])
   @@index([userId])
 }

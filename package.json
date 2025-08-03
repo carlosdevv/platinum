@@ -47,7 +47,6 @@
     "node-cache": "^5.1.2",
     "nuqs": "^2.4.0",
     "postcss": "^8.4.35",
-    "psn-api": "^2.11.0",
     "react": "19.0.0",
     "react-aria-components": "^1.6.0",
     "react-dom": "19.0.0",

@@ -2,18 +2,7 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "image.api.playstation.com",
-      },
-      {
-        protocol: "https",
-        hostname: "agst.prod.dl.playstation.net",
-      },
-      {
-        protocol: "https",
-        hostname: "psnobj.prod.dl.playstation.net",
-      },
+
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",

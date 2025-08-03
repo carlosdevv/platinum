@@ -1,59 +1,55 @@
 "use client";
 
-import { platinumTrophy } from "@/components/icons";
-import { SkeletonTrophies } from "@/components/skeletons/skeleton-trophies";
+import { Icons } from "@/components/icons";
 import { useGameContext } from "@/context/useGameContext";
-import Image from "next/image";
 
 export function TrophyInfo() {
-  const {
-    platinumGames,
-    isLoadingPsnGames,
-    isLoadingSteamGames,
-    psnGames,
-    steamGames,
-    dbGames,
-  } = useGameContext();
+  const { isLoadingDbGames, steamGames, dbGames } = useGameContext();
+
+  if (isLoadingDbGames) {
+    return (
+      <div className="flex items-center gap-4 animate-pulse">
+        <div className="flex items-center gap-2">
+          <div className="size-5 bg-gray-700 rounded-full"></div>
+          <div className="h-4 w-4 bg-gray-700 rounded"></div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-6 w-8 bg-gray-700 rounded"></div>
+          <div className="h-4 w-4 bg-gray-700 rounded"></div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-6 w-8 bg-gray-700 rounded"></div>
+          <div className="h-4 w-4 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Contar jogos platinados da Steam
+  const steamPlatinumCount = steamGames.filter(game => game.isCompleted).length;
+  
+  // Contar jogos platinados do banco de dados
+  const dbPlatinumCount = dbGames.filter(game => game.hasPlatinum).length;
+  
+  // Total de jogos platinados
+  const platinumCount = steamPlatinumCount + dbPlatinumCount;
+  
+  // Contar por plataforma
+  const ps5Count = dbGames.filter((game) => game.platform === "PS5" && game.hasPlatinum).length;
+  const pcCount = steamPlatinumCount + dbGames.filter((game) => game.platform === "PC" && game.hasPlatinum).length;
 
   return (
-    <>
-      {isLoadingPsnGames || isLoadingSteamGames ? (
-        <SkeletonTrophies />
-      ) : (
-        platinumGames && (
-          <div className="flex items-center gap-4">
-            <div className="flex items-end gap-2">
-              <Image
-                src={platinumTrophy}
-                alt="platinumTrophy"
-                width={20}
-                height={20}
-              />
-              <h4 className="text-white font-semibold">
-                {platinumGames.length}
-              </h4>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="font-semibold text-center text-background text-xs py-0.5 w-[35px] bg-white rounded">
-                PS5
-              </span>
-              <span>
-                {psnGames.length +
-                  dbGames.filter((game) => game.platform === "PS5").length}
-              </span>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="font-semibold text-center text-background text-xs py-0.5 w-[35px] bg-white rounded">
-                PC
-              </span>
-              <span>
-                {steamGames.length +
-                  dbGames.filter((game) => game.platform === "PC").length}
-              </span>
-            </div>
-          </div>
-        )
-      )}
-    </>
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2">
+        <Icons.Trophy className="text-white size-5 ps5-text-glow" />
+        <span className="text-white ps5-text-glow">{platinumCount}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-white ps5-text-glow">PS5 {ps5Count}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-white ps5-text-glow">PC {pcCount}</span>
+      </div>
+    </div>
   );
 }

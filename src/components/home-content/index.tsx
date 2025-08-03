@@ -1,14 +1,24 @@
-import { CardGame } from "@/components/card-game";
+"use client";
+
 import { Menu } from "@/components/menu";
+import { SkeletonMenu } from "@/components/skeletons/skeleton-menu";
+import { useGameContext } from "@/context/useGameContext";
 
 export function HomeContent() {
+  const { isLoadingDbGames } = useGameContext();
+
   return (
-    <section className="mt-12 flex flex-col mx-auto max-w-screen-2xl px-4">
-      <h1 className="text-white font-medium text-4xl mb-4">Games</h1>
-      <div className="flex w-full items-center justify-between">
-        <Menu />
+    <div className="flex flex-col gap-6 pt-4">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-white font-light text-6xl ps5-text-glow tracking-wide">
+          Games
+        </h1>
+        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-60" />
       </div>
-      <CardGame />
-    </section>
+      
+      <div className="mt-2">
+        {isLoadingDbGames ? <SkeletonMenu /> : <Menu />}
+      </div>
+    </div>
   );
 }

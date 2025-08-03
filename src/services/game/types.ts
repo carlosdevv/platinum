@@ -5,13 +5,7 @@ interface GameProps {
   hasPlatinum?: boolean;
   lastPlayed: number;
 }
-export interface FetchPsnGamesResponse extends GameProps {
-  progress?: number;
-  totalTrophies?: number;
-  earnedTrophies?: number;
-  npCommunicationId?: string;
-  trophySetVersion?: string;
-}
+
 
 export interface FetchSteamGamesResponse extends GameProps {
   appId?: string;
@@ -42,7 +36,7 @@ export interface TrophyCount {
   platinum: number;
 }
 
-export interface GameDetails extends FetchPsnGamesResponse {
+export interface GameDetails extends GameProps {
   trophies: TrophyCount;
   description?: string;
   releaseDate?: string;

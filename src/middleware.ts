@@ -3,13 +3,20 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 const publicRoutes = ["/login"];
+const publicApiRoutes = ["/api/steam", "/api/games", "/api/auth"];
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname);
+  const isPublicApiRoute = publicApiRoutes.some(route => req.nextUrl.pathname.startsWith(route));
   const isAuthCallback = req.nextUrl.pathname.startsWith("/api/auth");
 
   if (isAuthCallback) {
+    return NextResponse.next();
+  }
+
+  // Permitir APIs públicas sem autenticação
+  if (isPublicApiRoute) {
     return NextResponse.next();
   }
 

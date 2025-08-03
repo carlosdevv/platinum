@@ -1,14 +1,10 @@
 "use client";
 
-import {
-  type DatabaseGameResponse,
-  type FetchPsnGamesResponse,
-  type FetchSteamGamesResponse,
-} from "@/services/game/types";
-import {
-  useFetchPsnGames,
-  useFetchSteamGames,
-} from "@/services/game/useGameService";
+import { syncSteamGames as syncSteamGamesAction } from "@/actions/sync-steam-games";
+import { fetchSteamGames } from "@/services/game";
+import { FetchSteamGamesResponse } from "@/services/game/types";
+import { Game } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import {
   ReactNode,
   createContext,
@@ -16,144 +12,171 @@ import {
   useEffect,
   useState,
 } from "react";
-
-enum MenuOptions {
-  PLATINUM = 1,
-  PS5 = 2,
-  STEAM = 3,
-}
+import { toast } from "sonner";
 
 interface GameContextType {
   gameSelected: number;
-  setGameSelected: React.Dispatch<React.SetStateAction<number>>;
-  handlePressL1: () => void;
-  handlePressR1: () => void;
-  isLoadingPsnGames: boolean;
-  isLoadingSteamGames: boolean;
-  isLoadingDbGames: boolean;
-  psnGames: FetchPsnGamesResponse[];
-  platinumGames: FetchPsnGamesResponse[];
+  setGameSelected: (index: number) => void;
+  menuSelected: string;
+  setMenuSelected: (menu: string) => void;
+  dbGames: Game[];
   steamGames: FetchSteamGamesResponse[];
-  dbGames: DatabaseGameResponse[];
-  menuSelected: number;
-  setMenuSelected: React.Dispatch<React.SetStateAction<number>>;
-  handleShowListOption: () =>
-    | FetchPsnGamesResponse[]
-    | FetchSteamGamesResponse[]
-    | DatabaseGameResponse[];
+  isLoadingDbGames: boolean;
+  isLoadingSteamGames: boolean;
+  isSyncingSteam: boolean;
+  syncProgress: number;
+  syncMessage: string;
+  allGames: (Game | FetchSteamGamesResponse)[];
+  gamesByMenu: (Game | FetchSteamGamesResponse)[];
+  hasGames: boolean;
+  fetchDbGames: () => Promise<void>;
+  syncSteamGames: () => Promise<void>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export function GameProvider({ children }: { children: ReactNode }) {
+  const { data: session } = useSession();
   const [gameSelected, setGameSelected] = useState(0);
-  const [menuSelected, setMenuSelected] = useState(1);
-  const [dbGames, setDbGames] = useState<DatabaseGameResponse[]>([]);
-  const [isLoadingDbGames, setIsLoadingDbGames] = useState(true);
+  const [menuSelected, setMenuSelected] = useState("all");
+  const [dbGames, setDbGames] = useState<Game[]>([]);
+  const [steamGames, setSteamGames] = useState<FetchSteamGamesResponse[]>([]);
+  const [isLoadingDbGames, setIsLoadingDbGames] = useState(false);
+  const [isLoadingSteamGames, setIsLoadingSteamGames] = useState(false);
+  const [isSyncingSteam, setIsSyncingSteam] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
+  const [syncMessage, setSyncMessage] = useState("");
 
-  const { data: psnGames = [], isLoading: isLoadingPsnGames } =
-    useFetchPsnGames({
-      staleTime: 1000 * 60 * 60, // 1 hour
-    });
-
-  const { data: steamGames = [], isLoading: isLoadingSteamGames } =
-    useFetchSteamGames(
-      { steamUserId: "76561199012234177" },
-      {
-        staleTime: 1000 * 60 * 60, // 1 hour
-      }
-    );
-
-  // Função para buscar jogos do banco de dados
   const fetchDbGames = async () => {
+    if (!session?.user?.id) return;
+
     setIsLoadingDbGames(true);
     try {
       const response = await fetch("/api/games");
       if (!response.ok) {
-        throw new Error("Failed to fetch games from database");
+        throw new Error("Error loading games from database");
       }
       const data = await response.json();
-      setDbGames(data);
+      setDbGames(data || []);
     } catch (error) {
-      console.error("Error fetching games from database:", error);
+      console.error("Error fetching db games:", error);
+      toast.error("Error loading games from database");
+      setDbGames([]);
     } finally {
       setIsLoadingDbGames(false);
     }
   };
 
+  const syncSteamGames = async () => {
+    if (!session?.user?.id) {
+      toast.error("You need to be logged in to sync");
+      return;
+    }
+
+    const steamUserId = "76561199012234177";
+
+    setIsSyncingSteam(true);
+    setSyncProgress(0);
+    setSyncMessage("Starting sync...");
+
+    try {
+      setSyncProgress(10);
+      setSyncMessage("Searching for Steam games...");
+
+      // Fazer a requisição Steam primeiro para mostrar progresso real
+      const steamGamesResult = await fetchSteamGames(steamUserId);
+      
+      setSyncProgress(40);
+      setSyncMessage("Checking platinum games...");
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setSyncProgress(60);
+      setSyncMessage("Checking duplicates...");
+
+      const result = await syncSteamGamesAction({
+        userId: session.user.id,
+        steamUserId,
+      });
+
+      setSyncProgress(80);
+      setSyncMessage("Saving to database...");
+
+      await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+
+      setSyncProgress(100);
+      setSyncMessage("Sync completed!");
+
+      if (result.success) {
+        toast.success(result.message);
+        
+        await fetchDbGames();
+        
+        if (steamGamesResult && Array.isArray(steamGamesResult)) {
+          setSteamGames(steamGamesResult);
+        }
+      }
+    } catch (error) {
+      console.error("Error syncing Steam games:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Error syncing: ${errorMessage}`);
+      setSyncProgress(0);
+      setSyncMessage("");
+    } finally {
+      setIsSyncingSteam(false);
+      setTimeout(() => {
+        setSyncProgress(0);
+        setSyncMessage("");
+      }, 2000);
+    }
+  };
+
   useEffect(() => {
     fetchDbGames();
-  }, []);
+  }, [session?.user?.id]);
 
-  const platinumGames = psnGames
-    .filter((game) => game.hasPlatinum)
-    .concat(
-      steamGames.map((game) => ({
-        iconUrl: game.iconUrl,
-        name: game.name,
-        progress: game.progress,
-        totalTrophies: game.totalAchievements,
-        earnedTrophies: game.earnedAchievements,
-        hasPlatinum: game.isCompleted,
-        lastPlayed: game.lastPlayed,
-        platform: game.platform,
-      }))
-    )
-    .concat(
-      dbGames.map((game) => ({
-        lastPlayed: game.lastPlayed,
-        iconUrl: game.iconUrl,
-        name: game.name,
-        platform: game.platform,
-        hasPlatinum: game.hasPlatinum,
-      }))
-    );
+  const allGames = [...steamGames, ...dbGames];
 
-  const ps5Games = psnGames.concat(
-    dbGames.filter((game) => game.platform === "PS5")
-  );
+  const gamesByMenu = (() => {
+    switch (menuSelected) {
+      case "all":
+        return allGames;
+      case "ps5":
+        return dbGames.filter((game) => game.platform === "PS5");
+      case "pc":
+        return [...steamGames, ...dbGames.filter((game) => game.platform === "PC")];
+      default:
+        return allGames;
+    }
+  })();
 
-  const pcGames = steamGames.concat(
-    dbGames.filter((game) => game.platform === "PC")
-  );
+  const hasGames = gamesByMenu.length > 0;
 
-  const handlePressL1 = () => {
-    const games = handleShowListOption();
-    setGameSelected((prev) => (prev > 0 ? prev - 1 : games.length - 1));
-  };
-
-  const handlePressR1 = () => {
-    const games = handleShowListOption();
-    setGameSelected((prev) => (prev < games.length - 1 ? prev + 1 : 0));
-  };
-
-  const handleShowListOption = () => {
-    const listOption = {
-      [Number(MenuOptions.PLATINUM)]: platinumGames,
-      [Number(MenuOptions.PS5)]: ps5Games,
-      [Number(MenuOptions.STEAM)]: pcGames,
-    };
-
-    return listOption[menuSelected];
-  };
+  useEffect(() => {
+    if (gamesByMenu.length > 0 && gameSelected >= gamesByMenu.length) {
+      setGameSelected(0);
+    }
+  }, [gamesByMenu.length, gameSelected]);
 
   return (
     <GameContext.Provider
       value={{
         gameSelected,
         setGameSelected,
-        handlePressL1,
-        handlePressR1,
-        isLoadingPsnGames,
-        isLoadingDbGames,
-        psnGames,
-        platinumGames,
         menuSelected,
         setMenuSelected,
-        handleShowListOption,
-        isLoadingSteamGames,
-        steamGames,
         dbGames,
+        steamGames,
+        isLoadingDbGames,
+        isLoadingSteamGames,
+        isSyncingSteam,
+        syncProgress,
+        syncMessage,
+        allGames,
+        gamesByMenu,
+        hasGames,
+        fetchDbGames,
+        syncSteamGames,
       }}
     >
       {children}
@@ -163,7 +186,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
 export function useGameContext() {
   const context = useContext(GameContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useGameContext must be used within a GameProvider");
   }
   return context;

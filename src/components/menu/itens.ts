@@ -1,22 +1,22 @@
 export type MenuItensProps = {
-  id: number;
+  id: string;
   name: string;
   isSelected: boolean;
 };
 
 export const menuItens: MenuItensProps[] = [
   {
-    id: 1,
+    id: "all",
     name: "All",
     isSelected: true,
   },
   {
-    id: 2,
+    id: "ps5",
     name: "PS5",
     isSelected: false,
   },
   {
-    id: 3,
+    id: "pc",
     name: "PC",
     isSelected: false,
   },

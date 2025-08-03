@@ -1,62 +1,20 @@
-import { AxiosError } from "axios";
-import { UseQueryOptions, useQuery } from "react-query";
-import {
-  fetchPsnGameDetails,
-  fetchPsnGames,
-  fetchSteamGameDetails,
-  fetchSteamGames,
-} from ".";
-import {
-  FetchPsnGamesResponse,
-  type FetchSteamGamesResponse,
-  type SteamGameDetailsResponse,
-} from "./types";
+"use client";
 
-export const useFetchPsnGames = (
-  options?: UseQueryOptions<FetchPsnGamesResponse[], AxiosError>
-) =>
-  useQuery<FetchPsnGamesResponse[], AxiosError>(
-    ["psn-games"],
-    () => fetchPsnGames(),
-    {
-      ...options,
-    }
-  );
+import { useQuery } from "@tanstack/react-query";
+import { fetchSteamGameDetails } from ".";
+import { SteamGameDetailsResponse } from "./types";
 
-export const useFetchPsnGameDetails = (
-  gameId: string,
-  options?: UseQueryOptions<FetchPsnGamesResponse, AxiosError>
-) =>
-  useQuery<FetchPsnGamesResponse, AxiosError>(
-    ["psn-game-details", gameId],
-    () => fetchPsnGameDetails(gameId),
-    {
-      ...options,
-    }
-  );
-
-export const useFetchSteamGames = (
-  props: {
-    steamUserId: string;
-  },
-  options?: UseQueryOptions<FetchSteamGamesResponse[], AxiosError>
-) =>
-  useQuery<FetchSteamGamesResponse[], AxiosError>(
-    ["steam-games"],
-    () => fetchSteamGames(props.steamUserId),
-    {
-      ...options,
-    }
-  );
+interface UseFetchSteamGameDetailsOptions {
+  enabled?: boolean;
+}
 
 export const useFetchSteamGameDetails = (
   gameName: string,
-  options?: UseQueryOptions<SteamGameDetailsResponse, AxiosError>
-) =>
-  useQuery<SteamGameDetailsResponse, AxiosError>(
-    ["steam-game-details", gameName],
-    () => fetchSteamGameDetails(gameName),
-    {
-      ...options,
-    }
-  );
+  options?: UseFetchSteamGameDetailsOptions
+) => {
+  return useQuery<SteamGameDetailsResponse>({
+    queryKey: ["steam-game-details", gameName],
+    queryFn: () => fetchSteamGameDetails(gameName),
+    enabled: options?.enabled,
+  });
+};

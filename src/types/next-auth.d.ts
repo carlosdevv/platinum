@@ -8,6 +8,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       accessToken?: string;
+      steamUserId?: string;
     };
   }
 
@@ -21,6 +22,7 @@ declare module "next-auth" {
     id: string;
     accessToken?: string;
     refreshToken?: string;
+    steamUserId?: string;
   }
 
   interface Profile {

@@ -1,11 +1,11 @@
 import { platinumTrophy } from "@/components/icons";
-import { FetchPsnGamesResponse } from "@/services/game/types";
 import Image from "next/image";
 
-type CardGameResumeProps = Pick<
-  FetchPsnGamesResponse,
-  "name" | "lastPlayed" | "platform"
->;
+type CardGameResumeProps = {
+  name?: string;
+  lastPlayed?: number;
+  platform?: string;
+};
 
 export function CardGameResume({
   name,
@@ -25,23 +25,47 @@ export function CardGameResume({
     return dateFormated;
   }
 
+  if (!name) return null;
+
   return (
-    <div className="flex flex-col mt-10">
-      <div className="flex items-center gap-4">
-        <Image src={platinumTrophy} alt="trophy" width={32} height={32} />
-        <h1 className="text-5xl font-light text-white">{name}</h1>
-        <span className="bg-white text-background text-sm font-semibold rounded-md px-2 py-0.5">
-          {platform.includes("Steam") || platform === "PC" ? "PC" : "PS5"}
-        </span>
-      </div>
-      <div className="mt-8 grid-cols-3 w-auto gap-16 flex items-center">
-        <div className="flex flex-col gap-2">
-          <span className="text-slate-300 text-xs">Last played</span>
-          <span className="text-white text-2xl">
-            {convertTimePlayed(lastPlayed)}
+    <div className="flex flex-col gap-4 py-4">
+      {/* Game Title */}
+      <h1 className="text-white text-4xl font-light tracking-wide ps5-text-glow">
+        {name}
+      </h1>
+      
+      {/* Game Details */}
+      <div className="flex items-center gap-6">
+        {/* Trophy Icon */}
+        <div className="flex items-center gap-2">
+          <Image 
+            src={platinumTrophy} 
+            alt="trophy" 
+            width={20} 
+            height={20} 
+            className="opacity-80"
+          />
+        </div>
+        
+        {/* Platform Badge */}
+        <div className="px-3 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/20">
+          <span className="text-white text-sm font-medium">
+            {platform?.includes("Steam") || platform === "PC" ? "PC" : "PS5"}
           </span>
         </div>
+        
+        {/* Last Played */}
+        <div className="flex flex-col">
+          <span className="text-gray-400 text-xs uppercase tracking-wider font-medium">
+            Last played
+          </span>
+          <span className="text-white text-sm font-light">
+            {lastPlayed ? convertTimePlayed(lastPlayed) : "Never"}
+          </span>
+        </div>
+
       </div>
     </div>
   );
 }
+

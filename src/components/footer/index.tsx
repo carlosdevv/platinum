@@ -3,62 +3,120 @@
 import { Icons } from "@/components/icons";
 import { useGameContext } from "@/context/useGameContext";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect } from "react";
 
-export default function Footer() {
-  const { isLoadingPsnGames, isLoadingSteamGames } = useGameContext();
-  const isLoading = isLoadingPsnGames || isLoadingSteamGames;
+export function Footer() {
+  const { isLoadingDbGames, gameSelected, gamesByMenu, hasGames } = useGameContext();
+  const [, setRemoveModalOpen] = useQueryState("remove-game-modal", parseAsBoolean.withDefault(false));
+  const [, setUpdateModalOpen] = useQueryState("update-game-modal", parseAsBoolean.withDefault(false));
+  const [, setAddModalOpen] = useQueryState("add-game-modal", parseAsBoolean.withDefault(false));
+  const [, setSearchModalOpen] = useQueryState("search-game-modal", parseAsBoolean.withDefault(false));
 
-  const [, onOpenAddGameModal] = useQueryState(
-    "add-game-modal",
-    parseAsBoolean
-  );
+  const isLoading = isLoadingDbGames;
+  const currentGame = gamesByMenu[gameSelected];
+  const isDbGame = currentGame && 'id' in currentGame;
 
-  const [, onOpenSearchGameModal] = useQueryState(
-    "search-game-modal",
-    parseAsBoolean
-  );
+  const handleDeleteGame = () => {
+    if (!hasGames) return;
+    setRemoveModalOpen(true);
+  };
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "x" && !isLoading) {
-        onOpenAddGameModal(true);
-      }
+  const handleUpdateGame = () => {
+    if (!hasGames) return;
+    setUpdateModalOpen(true);
+  };
 
-      if (event.key === "c" && !isLoading) {
-        onOpenSearchGameModal(true);
-      }
-    };
+  const handleAddGame = () => {
+    setAddModalOpen(true);
+  };
 
-    window.addEventListener("keydown", handleKeyDown);
+  const handleSearchGame = () => {
+    setSearchModalOpen(true);
+  };
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onOpenAddGameModal, isLoading]);
+  if (isLoading) {
+    return (
+      <footer className="py-6">
+        <div className="flex items-center justify-center gap-8">
+          <div className="flex items-center gap-3 animate-pulse">
+            <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+            <span className="text-gray-400 text-sm font-semibold">Loading...</span>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
-    <>
-      {!isLoading && (
-        <footer className="w-full absolute bottom-0 flex gap-x-8 justify-end items-center pr-10 pb-4">
+    <footer className="py-6">
+      <div className="flex items-center justify-end pr-16 gap-6">
+        {/* Delete Game Button - Only show for database games */}
+        {isDbGame && (
           <button
-            type="button"
-            onClick={() => onOpenAddGameModal(true)}
-            className="flex gap-x-2"
+            onClick={handleDeleteGame}
+            className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
           >
-            <Icons.Close className="text-background size-5 rounded-full bg-white p-0.5" />
-            <span className="text-white text-sm">ADD GAME</span>
+            <div className="relative">
+              <div className="w-6 h-6 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                <Icons.X className="size-4" />
+              </div>
+              <div className="absolute inset-0 w-6 h-6 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+            </div>
+            <span className="text-gray-50 text-sm font-medium ps5-text-glow uppercase tracking-wider">
+              Delete Game
+            </span>
           </button>
+        )}
+
+        {/* Update Game Button - Only show for database games */}
+        {isDbGame && (
           <button
-            type="button"
-            onClick={() => onOpenSearchGameModal(true)}
-            className="flex gap-x-2"
+            onClick={handleUpdateGame}
+            className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
           >
-            <Icons.Square className="text-background size-5 rounded-full bg-white p-[3px]" />
-            <span className="text-white text-sm">SEARCH GAME</span>
+            <div className="relative">
+              <div className="w-6 h-6 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                <Icons.Circle className="size-4" />
+              </div>
+              <div className="absolute inset-0 w-6 h-6 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+            </div>
+            <span className="text-gray-50 text-sm font-medium ps5-text-glow uppercase tracking-wider">
+              Update Game
+            </span>
           </button>
-        </footer>
-      )}
-    </>
+        )}
+
+        {/* Add Game Button */}
+        <button
+          onClick={handleAddGame}
+          className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
+        >
+          <div className="relative">
+            <div className="w-6 h-6 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+              <Icons.Square className="size-4" />
+            </div>
+            <div className="absolute inset-0 w-6 h-6 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+          </div>
+          <span className="text-gray-50 text-sm font-medium ps5-text-glow uppercase tracking-wider">
+            Add Game
+          </span>
+        </button>
+
+        {/* Search Game Button */}
+        <button
+          onClick={handleSearchGame}
+          className="flex items-center gap-3 group transition-all duration-300 hover:scale-105"
+        >
+          <div className="relative">
+            <div className="w-6 h-6 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+              <Icons.Triangle className="size-4" />
+            </div>
+            <div className="absolute inset-0 w-6 h-6 bg-black/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+          </div>
+          <span className="text-gray-50 text-sm font-medium ps5-text-glow uppercase tracking-wider">
+            Search Game
+          </span>
+        </button>
+      </div>
+    </footer>
   );
 }

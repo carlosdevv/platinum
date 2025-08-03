@@ -4,13 +4,13 @@ import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signOut, useSession } from "next-auth/react";
@@ -25,8 +25,8 @@ export function HeaderAvatar() {
     <>
       <Dialog>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2">
-            <Avatar className="cursor-pointer">
+          <DropdownMenuTrigger className="flex items-center gap-3 group">
+            <Avatar className="cursor-pointer ring-2 ring-white/20 group-hover:ring-white/40 transition-all duration-300">
               {!isLoading && session?.user?.image ? (
                 <Image
                   src={session.user.image}
@@ -36,7 +36,7 @@ export function HeaderAvatar() {
                   className="rounded-full"
                 />
               ) : (
-                <AvatarFallback>
+                <AvatarFallback className="bg-gray-700/50 backdrop-blur-sm">
                   <Skeleton className="size-10 flex items-center justify-center rounded-full">
                     {session?.user?.name?.[0]?.toUpperCase()}
                   </Skeleton>
@@ -45,26 +45,30 @@ export function HeaderAvatar() {
             </Avatar>
             {!isLoading && (
               <div className="flex flex-col gap-y-1">
-                <span className="text-white text-xs font-semibold">
+                <span className="text-white text-xs font-medium ps5-text-glow">
                   {session?.user?.name?.split(" ")[0] +
                     " " +
                     session?.user?.name?.split(" ")[1]}
                 </span>
-                <Icons.EllipsisHorizontal className="text-white p-1 rounded-full bg-gray-700 size-5" />
+                <div className="w-6 h-6 bg-gray-700/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 group-hover:bg-gray-600/50 transition-all duration-300">
+                  <Icons.EllipsisHorizontal className="text-white/80 size-3" />
+                </div>
               </div>
             )}
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
+          <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 min-w-[180px] p-2 mt-2">
+            <DropdownMenuLabel className="text-white/60 text-xs font-medium uppercase tracking-wider px-2 py-1">
+              Actions
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/10" />
             <DropdownMenuGroup>
               <DialogTrigger asChild>
                 <DropdownMenuItem
                   onClick={() => signOut()}
-                  className="flex items-center justify-between cursor-pointer"
+                  className="flex items-center justify-between cursor-pointer text-white/80 hover:text-red-400 hover:bg-red-500/10 rounded-lg px-3 py-2 transition-all duration-300 group"
                 >
-                  <span>Sign Out</span>
-                  <Icons.SignOut className="size-4" />
+                  <span className="text-sm font-medium group-hover:text-red-400 transition-colors duration-300">Sign Out</span>
+                  <Icons.SignOut className="size-4 text-red-400 group-hover:text-red-400 transition-colors duration-300" />
                 </DropdownMenuItem>
               </DialogTrigger>
             </DropdownMenuGroup>

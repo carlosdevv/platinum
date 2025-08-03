@@ -18,12 +18,10 @@ export async function GET(request: NextRequest) {
   const cachedData = getCachedData(cacheKey);
 
   if (cachedData) {
-    console.log(`Returning cached data for ${steamUserId}`);
     return NextResponse.json({ result: cachedData });
   }
 
   try {
-    console.log(`Fetching Steam games for user ${steamUserId}`);
     // Obter lista de jogos do usuário
     const gamesResponse = await fetch(
       `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamUserId}&format=json&include_appinfo=true`
@@ -51,8 +49,6 @@ export async function GET(request: NextRequest) {
         (game: any) => game.playtime_forever > 0
       ) || [];
 
-    console.log(`Found ${games.length} games with playtime`);
-
     const gamesWithAchievements: FetchSteamGamesResponse[] = [];
     const processedGames: string[] = [];
 
@@ -65,8 +61,6 @@ export async function GET(request: NextRequest) {
       processedGames.push(game.appid.toString());
 
       try {
-        console.log(`Processing game: ${game.name} (${game.appid})`);
-
         // Obter informações sobre todas as conquistas do jogo primeiro
         const gameSchemaResponse = await fetch(
           `https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game.appid}&key=${STEAM_API_KEY}`
@@ -133,7 +127,7 @@ export async function GET(request: NextRequest) {
         // Só adicionar jogos que têm pelo menos uma conquista obtida
         if (earnedAchievements > 0) {
           console.log(
-            `Adding game ${game.name}: ${earnedAchievements}/${totalAchievements} achievements (${progress}%)`
+            `Adding game ${game.name}: ${earnedAchievements}/${totalAchievements} achievements (${progress}%) - isCompleted: ${isCompleted}`
           );
 
           gamesWithAchievements.push({
@@ -161,13 +155,12 @@ export async function GET(request: NextRequest) {
         game.isCompleted && game.totalAchievements && game.totalAchievements > 0
     );
 
-    console.log(
-      `Found ${completedGames.length} completed games out of ${gamesWithAchievements.length} games with achievements`
-    );
-
     // Armazenar no cache apenas se encontrou jogos
     if (completedGames.length > 0) {
       setCachedData(cacheKey, completedGames);
+      console.log(`Cached ${completedGames.length} completed games`);
+    } else {
+      console.log("No completed games to cache");
     }
 
     return NextResponse.json({
