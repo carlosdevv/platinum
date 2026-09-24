@@ -2,6 +2,7 @@ import { TailwindIndicator } from "@/components/TailwindIndicator";
 import { cn } from "@/lib/utils";
 import { AppProviders } from "@/providers/app-providers";
 import { Inter as FontSans } from "next/font/google";
+import type { Viewport } from "next";
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -27,6 +28,9 @@ export const metadata = {
     },
   ],
   creator: "Carlos Lopes",
+};
+
+export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },

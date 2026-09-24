@@ -15,11 +15,11 @@ As a gaming enthusiast who enjoys challenging myself and getting the most out of
 
 ## Technologies Used
 
-- **Frontend**: Next.js, React, TypeScript
+- **Frontend**: Next.js 16, React 19, TypeScript 6
 - **Backend**: Next.js API Routes
 - **Authentication**: NextAuth.js with Google Provider
-- **Database**: Prisma ORM
-- **Styling**: Tailwind CSS
+- **Database**: Prisma ORM 7 with PostgreSQL
+- **Styling**: Tailwind CSS 4
 
 ## Main Features
 
@@ -49,8 +49,8 @@ src/
 
 ### Prerequisites
 
-- Node.js (version 16 or higher)
-- NPM or Yarn
+- Node.js 22.12 or higher
+- pnpm 11 (via Corepack or a local installation)
 - Google account for OAuth authentication
 
 ### Environment Variables
@@ -67,31 +67,29 @@ NEXTAUTH_URL="http://localhost:3000"
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/game-platinum-tracker.git
-   cd game-platinum-tracker
+   git clone https://github.com/carlosdevv/platinum.git
+   cd platinum
    ```
 
 2. Install dependencies:
    ```bash
-   npm install
-   # or
-   yarn install
+   pnpm install
    ```
 
 3. Set up the database:
    ```bash
-   npx prisma generate
-   npx prisma db push
+   pnpm exec prisma generate
+   pnpm exec prisma migrate deploy
    ```
 
 4. Start the development server:
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   pnpm dev
    ```
 
 5. Access the application at `http://localhost:3000`
+
+Run `pnpm lint`, `pnpm typecheck`, and `pnpm build` before deploying. The build generates the Prisma client automatically.
 
 ## Deployment
 

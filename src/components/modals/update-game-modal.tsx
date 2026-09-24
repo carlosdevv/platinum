@@ -39,7 +39,7 @@ const formSchema = z.object({
   iconUrl: z.string().url().optional().or(z.literal("")),
   lastPlayed: z.string().min(1, "Last played date is required"),
   platform: z.enum(["PS5", "PC"], {
-    required_error: "Platform is required",
+    error: "Platform is required",
   }),
 });
 
@@ -250,4 +250,4 @@ export function UpdateGameModal() {
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -41,7 +41,7 @@ import { z } from "zod";
 const formSchema = z.object({
   name: z.string().min(1, "Game name is required"),
   platform: z.enum(["PS5", "PC"], {
-    required_error: "Platform is required",
+    error: "Platform is required",
   }),
   iconUrl: z.string().url().optional().or(z.literal("")),
 });

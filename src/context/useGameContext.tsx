@@ -3,7 +3,7 @@
 import { syncSteamGames as syncSteamGamesAction } from "@/actions/sync-steam-games";
 import { fetchSteamGames } from "@/services/game";
 import { FetchSteamGamesResponse } from "@/services/game/types";
-import { Game } from "@prisma/client";
+import type { Game } from "@/generated/prisma/client";
 import { useSession } from "next-auth/react";
 import {
   ReactNode,
