@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prismadb";
+import type { GameImageFit, GameImagePosition } from "@/lib/game-artwork";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -74,10 +75,19 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, iconUrl, lastPlayed, platform } = body;
+    const { name, iconUrl, lastPlayed, platform, imageFit, imagePosition } = body;
 
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
+    }
+
+    const validFits: GameImageFit[] = ["auto", "cover", "contain"];
+    const validPositions: GameImagePosition[] = ["center", "top", "bottom", "left", "right"];
+    if (
+      (imageFit !== undefined && !validFits.includes(imageFit)) ||
+      (imagePosition !== undefined && !validPositions.includes(imagePosition))
+    ) {
+      return new NextResponse("Invalid image framing", { status: 400 });
     }
 
     const game = await prisma.game.findFirst({
@@ -99,6 +109,8 @@ export async function PATCH(request: Request) {
         iconUrl: iconUrl || null,
         lastPlayed: lastPlayed ? new Date(lastPlayed) : null,
         platform: platform || game.platform,
+        imageFit: imageFit ?? game.imageFit,
+        imagePosition: imagePosition ?? game.imagePosition,
       },
     });
 

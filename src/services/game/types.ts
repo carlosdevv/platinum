@@ -21,7 +21,7 @@ export type DatabaseGameResponse = GameProps & {
 
 export interface SteamGameDetailsResponse {
   results: {
-    appid: string;
+    appId: number;
     name: string;
     iconUrl?: string;
     logoUrl?: string;

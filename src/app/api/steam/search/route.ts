@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { steamPosterUrl } from "@/lib/game-artwork";
 
 export async function GET(request: NextRequest) {
   const searchQuery = request.nextUrl.searchParams.get("game");
@@ -21,12 +22,12 @@ export async function GET(request: NextRequest) {
       throw new Error("Failed to search Steam games");
     }
 
-    const results = await response.json();
+    const results: { appid: number; name: string }[] = await response.json();
 
-    const formattedResults = results.map((game: any) => ({
+    const formattedResults = results.map((game) => ({
       appId: game.appid,
       name: game.name,
-      iconUrl: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`,
+      iconUrl: steamPosterUrl(game.appid),
       logoUrl: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/logo.png`,
     }));
 

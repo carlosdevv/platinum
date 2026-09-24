@@ -1,6 +1,7 @@
 "use client";
 
 import { Icons } from "@/components/icons";
+import { GameCover } from "@/components/game-cover";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,12 +32,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
   iconUrl: z.string().url().optional().or(z.literal("")),
+  imageFit: z.enum(["auto", "cover", "contain"]),
+  imagePosition: z.enum(["center", "top", "bottom", "left", "right"]),
   lastPlayed: z.string().min(1, "Last played date is required"),
   platform: z.enum(["PS5", "PC"], {
     error: "Platform is required",
@@ -57,10 +60,15 @@ export function UpdateGameModal() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       iconUrl: "",
+      imageFit: "auto",
+      imagePosition: "center",
       lastPlayed: "",
       platform: "PS5",
     },
   });
+  const previewImageUrl = useWatch({ control: form.control, name: "iconUrl" });
+  const previewImageFit = useWatch({ control: form.control, name: "imageFit" });
+  const previewImagePosition = useWatch({ control: form.control, name: "imagePosition" });
 
   useEffect(() => {
     if (currentGame) {
@@ -69,6 +77,8 @@ export function UpdateGameModal() {
       
       form.reset({
         iconUrl: currentGame.iconUrl || "",
+        imageFit: "imageFit" in currentGame && ["auto", "cover", "contain"].includes(currentGame.imageFit) ? currentGame.imageFit as FormValues["imageFit"] : "auto",
+        imagePosition: "imagePosition" in currentGame && ["center", "top", "bottom", "left", "right"].includes(currentGame.imagePosition) ? currentGame.imagePosition as FormValues["imagePosition"] : "center",
         lastPlayed: currentGame.lastPlayed ? new Date(currentGame.lastPlayed).toISOString().split('T')[0] : "",
         platform: validPlatform,
       });
@@ -88,6 +98,8 @@ export function UpdateGameModal() {
         body: JSON.stringify({
           name: currentGame.name,
           iconUrl: values.iconUrl,
+          imageFit: values.imageFit,
+          imagePosition: values.imagePosition,
           lastPlayed: values.lastPlayed,
           platform: values.platform,
         }),
@@ -97,12 +109,12 @@ export function UpdateGameModal() {
         throw new Error("Failed to update game");
       }
 
-      toast.success(`${currentGame.name} was updated successfully!`);
+      toast.success(`${currentGame.name} atualizado com sucesso!`);
       setIsOpen(false);
       await fetchDbGames();
     } catch (error) {
       console.error("Error updating game:", error);
-      toast.error("Error updating game");
+      toast.error("Erro ao atualizar o jogo");
     } finally {
       setIsUpdating(false);
     }
@@ -118,25 +130,28 @@ export function UpdateGameModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md ps5-card border-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl">
+      <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto ps5-card border-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl">
         <DialogHeader>
           <DialogTitle className="text-white ps5-text-glow text-xl font-semibold flex items-center gap-3">
             <Icons.Circle className="text-blue-400 size-5" />
-            Update Game
+            Editar jogo
           </DialogTitle>
           <DialogDescription className="text-gray-300">
-            Update the game information in your library.
+            Ajuste a capa e os dados do jogo na sua biblioteca.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600">
-          {currentGame.iconUrl && (
-            <img
-              src={currentGame.iconUrl}
-              alt={currentGame.name}
-              className="w-16 h-16 rounded object-cover"
+          <div className="relative h-32 w-[88px] shrink-0 overflow-hidden rounded-md bg-slate-900">
+            <GameCover
+              key={previewImageUrl || "no-cover"}
+              imageUrl={previewImageUrl}
+              name={currentGame.name}
+              fit={previewImageFit}
+              position={previewImagePosition}
+              sizes="88px"
             />
-          )}
+          </div>
           <div className="flex-1">
             <h3 className="text-white font-semibold text-lg">{currentGame.name}</h3>
             <p className="text-gray-400 text-sm">
@@ -154,12 +169,12 @@ export function UpdateGameModal() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white ps5-text-glow">
-                    Icon URL
+                    URL da capa
                   </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="https://example.com/game-icon.jpg"
+                      placeholder="https://exemplo.com/capa.jpg"
                       className="ps5-card border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400"
                     />
                   </FormControl>
@@ -168,6 +183,55 @@ export function UpdateGameModal() {
               )}
             />
 
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="imageFit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Enquadramento</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full border-gray-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="auto">Automático</SelectItem>
+                        <SelectItem value="contain">Imagem inteira</SelectItem>
+                        <SelectItem value="cover">Preencher o card</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="imagePosition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Posição</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full border-gray-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="center">Centro</SelectItem>
+                        <SelectItem value="top">Topo</SelectItem>
+                        <SelectItem value="bottom">Base</SelectItem>
+                        <SelectItem value="left">Esquerda</SelectItem>
+                        <SelectItem value="right">Direita</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             {/* Last Played */}
             <FormField
               control={form.control}
@@ -175,7 +239,7 @@ export function UpdateGameModal() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white ps5-text-glow">
-                    Platinum Date
+                    Data da platina
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -196,12 +260,12 @@ export function UpdateGameModal() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white ps5-text-glow">
-                    Platform
+                    Plataforma
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="ps5-card border-gray-600 text-white">
-                        <SelectValue placeholder="Select platform" />
+                        <SelectValue placeholder="Selecione a plataforma" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="ps5-card border-gray-600">
@@ -225,7 +289,7 @@ export function UpdateGameModal() {
                 disabled={isUpdating}
                 className="bg-gray-500/20 backdrop-blur-md border border-gray-400/30 hover:bg-gray-500/30 transition-all duration-300 text-gray-300 font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                Cancelar
               </Button>
               <Button
                 type="submit"
@@ -235,12 +299,12 @@ export function UpdateGameModal() {
                 {isUpdating ? (
                   <>
                     <Icons.Loader className="size-4 animate-spin mr-2" />
-                    Updating...
+                    Atualizando...
                   </>
                 ) : (
                   <>
                     <Icons.Circle className="size-4 mr-2" />
-                    Update Game
+                    Salvar jogo
                   </>
                 )}
               </Button>

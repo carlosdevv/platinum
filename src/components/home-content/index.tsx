@@ -8,15 +8,17 @@ export function HomeContent() {
   const { isLoadingDbGames } = useGameContext();
 
   return (
-    <div className="flex flex-col gap-6 pt-4">
-      <div className="flex flex-col gap-4">
-        <h1 className="text-white font-light text-6xl ps5-text-glow tracking-wide">
+    <div className="flex flex-col gap-7 pt-[clamp(3.5rem,10vh,8rem)] sm:gap-9">
+      <div>
+        <p className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.34em] text-white/45">
+          Biblioteca
+        </p>
+        <h1 className="text-5xl font-light tracking-[-0.035em] text-white drop-shadow-[0_0_18px_rgba(255,255,255,0.28)] sm:text-6xl">
           Games
         </h1>
-        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-60" />
       </div>
-      
-      <div className="mt-2">
+
+      <div className="px-8 sm:px-10">
         {isLoadingDbGames ? <SkeletonMenu /> : <Menu />}
       </div>
     </div>

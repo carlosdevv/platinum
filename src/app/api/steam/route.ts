@@ -1,8 +1,16 @@
 import { getCachedData, setCachedData } from "@/lib/cache";
+import { steamPosterUrl } from "@/lib/game-artwork";
 import { FetchSteamGamesResponse } from "@/services/game/types";
 import { NextResponse, type NextRequest } from "next/server";
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
+
+type SteamOwnedGame = {
+  appid: number;
+  name: string;
+  playtime_forever: number;
+  rtime_last_played?: number;
+};
 
 export async function GET(request: NextRequest) {
   const steamUserId = request.nextUrl.searchParams.get("steamUserId");
@@ -36,7 +44,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const gamesData = await gamesResponse.json();
+    const gamesData: { response?: { games?: SteamOwnedGame[] } } = await gamesResponse.json();
 
     if (!gamesData.response || !gamesData.response.games) {
       console.log("No games found or invalid response format", gamesData);
@@ -46,7 +54,7 @@ export async function GET(request: NextRequest) {
     // Filtrar jogos com tempo de jogo
     const games =
       gamesData.response.games.filter(
-        (game: any) => game.playtime_forever > 0
+        (game: SteamOwnedGame) => game.playtime_forever > 0
       ) || [];
 
     const gamesWithAchievements: FetchSteamGamesResponse[] = [];
@@ -131,7 +139,7 @@ export async function GET(request: NextRequest) {
           );
 
           gamesWithAchievements.push({
-            iconUrl: `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg`,
+            iconUrl: steamPosterUrl(game.appid, "cdn.akamai.steamstatic.com"),
             name: game.name,
             platform: "Steam",
             progress,

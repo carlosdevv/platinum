@@ -1,0 +1,3 @@
+ALTER TABLE "Game"
+ADD COLUMN "imageFit" TEXT NOT NULL DEFAULT 'auto',
+ADD COLUMN "imagePosition" TEXT NOT NULL DEFAULT 'center';

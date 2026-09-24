@@ -2,15 +2,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function SkeletonMenu() {
   return (
-    <section className="flex items-center gap-12 animate-pulse">
-      <Skeleton className="h-8 w-12 rounded-md bg-gradient-to-br from-gray-700 to-gray-800" />
+    <div className="console-filter-bar inline-flex items-center gap-2 rounded-2xl p-1.5">
+      <Skeleton className="h-10 w-11 rounded-xl bg-white/10" />
       {Array.from({ length: 3 }).map((_, index) => (
-        <Skeleton 
-          key={index} 
-          className="h-8 w-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-800" 
-        />
+        <Skeleton key={index} className="h-10 w-16 rounded-xl bg-white/10 sm:w-20" />
       ))}
-      <Skeleton className="h-8 w-12 rounded-md bg-gradient-to-br from-gray-700 to-gray-800" />
-    </section>
+      <Skeleton className="h-10 w-11 rounded-xl bg-white/10" />
+    </div>
   );
-} 
+}

@@ -6,6 +6,7 @@ import { Icons } from "@/components/icons";
 import { SkeletonHeader } from "@/components/skeletons/skeleton-header";
 import { useGameContext } from "@/context/useGameContext";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 function getCurrentHour() {
   return new Date().toLocaleTimeString("pt-BR", {
@@ -15,6 +16,7 @@ function getCurrentHour() {
 }
 
 export function Header() {
+  const [currentHour, setCurrentHour] = useState<string | null>(null);
   const {
     isLoadingDbGames,
     isSyncingSteam,
@@ -22,6 +24,13 @@ export function Header() {
     syncProgress,
     syncMessage,
   } = useGameContext();
+
+  useEffect(() => {
+    const updateHour = () => setCurrentHour(getCurrentHour());
+    updateHour();
+    const interval = window.setInterval(updateHour, 15_000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   if (isLoadingDbGames) {
     return <SkeletonHeader />;
@@ -33,7 +42,7 @@ export function Header() {
       <div className="flex items-center gap-4">
         <Icons.Wifi className="text-white size-5 ps5-text-glow" />
         <h3 className="text-white font-semibold ps5-text-glow">
-          {getCurrentHour()}
+          {currentHour ?? "--:--"}
         </h3>
 
         {/* Sync Button */}

@@ -5,12 +5,14 @@ type CardGameResumeProps = {
   name?: string;
   lastPlayed?: number;
   platform?: string;
+  showTitle?: boolean;
 };
 
 export function CardGameResume({
   name,
   lastPlayed,
   platform,
+  showTitle = true,
 }: CardGameResumeProps) {
   function convertTimePlayed(time: number) {
     const date = new Date(time);
@@ -28,14 +30,15 @@ export function CardGameResume({
   if (!name) return null;
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      {/* Game Title */}
-      <h1 className="text-white text-4xl font-light tracking-wide ps5-text-glow">
-        {name}
-      </h1>
+    <div className="flex flex-col gap-4 py-2">
+      {showTitle && (
+        <h2 className="text-3xl font-light tracking-wide text-white ps5-text-glow">
+          {name}
+        </h2>
+      )}
       
       {/* Game Details */}
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center gap-5 text-white/80">
         {/* Trophy Icon */}
         <div className="flex items-center gap-2">
           <Image 
@@ -68,4 +71,3 @@ export function CardGameResume({
     </div>
   );
 }
-

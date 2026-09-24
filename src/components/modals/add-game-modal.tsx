@@ -30,8 +30,10 @@ import {
 import { useGameContext } from "@/context/useGameContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFetchSteamGameDetails } from "@/services/game/useGameService";
+import type { SteamGameDetailsResponse } from "@/services/game/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -70,7 +72,7 @@ export function AddGameModal() {
     },
   });
 
-  const handleGameSelect = (game: any) => {
+  const handleGameSelect = (game: SteamGameDetailsResponse["results"][number]) => {
     form.setValue("name", game.name);
     form.setValue("iconUrl", game.iconUrl || "");
     setSearchTerm(game.name);
@@ -159,18 +161,20 @@ export function AddGameModal() {
                   {/* Steam Search Results */}
                   {steamSearchResults?.results && steamSearchResults.results.length > 0 && searchTerm.length >= 3 && (
                     <div className="mt-2 max-h-40 overflow-y-auto bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-600">
-                      {steamSearchResults.results.slice(0, 5).map((game: any, index: number) => (
+                      {steamSearchResults.results.slice(0, 5).map((game) => (
                         <button
-                          key={`${game.appid}-${index}`}
+                          key={game.appId}
                           type="button"
                           onClick={() => handleGameSelect(game)}
                           className="w-full p-3 text-left hover:bg-gray-700/50 transition-colors border-b border-gray-600 last:border-b-0 flex items-center gap-3"
                         >
                           {game.iconUrl && (
-                            <img
+                            <Image
                               src={game.iconUrl}
                               alt={game.name}
-                              className="w-8 h-8 object-cover rounded"
+                              width={32}
+                              height={48}
+                              className="h-12 w-8 rounded object-cover"
                             />
                           )}
                           <div className="flex-1">

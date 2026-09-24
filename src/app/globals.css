@@ -234,3 +234,106 @@
     opacity: 0.12;
   }
 }
+
+/* Home screen: warm console light and gently drifting bokeh. */
+.console-stage {
+  isolation: isolate;
+  background-color: #14161d;
+  background-image:
+    radial-gradient(ellipse 51% 63% at 13% 7%, rgba(169, 143, 142, 0.55), transparent 78%),
+    radial-gradient(ellipse 42% 55% at 29% 70%, rgba(112, 91, 93, 0.32), transparent 82%),
+    radial-gradient(ellipse 35% 44% at 77% 72%, rgba(43, 39, 49, 0.32), transparent 85%),
+    linear-gradient(112deg, #413b43 0%, #343038 32%, #20202a 65%, #10141e 100%);
+}
+
+.console-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(114deg, transparent 5%, rgba(255, 228, 215, 0.12) 13%, transparent 26%),
+    radial-gradient(circle at 19% 29%, rgba(247, 226, 199, 0.14), transparent 12%),
+    radial-gradient(circle at 29% 70%, rgba(215, 119, 104, 0.12), transparent 8%);
+}
+
+.console-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10, 13, 20, 0.04), transparent 45%, rgba(8, 12, 20, 0.3));
+}
+
+.console-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.console-atmosphere__beam {
+  position: absolute;
+  left: -13%;
+  top: -29%;
+  width: 71%;
+  height: 110%;
+  transform: rotate(19deg);
+  background: linear-gradient(90deg, transparent 31%, rgba(244, 213, 199, 0.07) 49%, transparent 67%);
+}
+
+.console-filter-bar {
+  background: linear-gradient(110deg, rgba(232, 224, 225, 0.11), rgba(114, 111, 128, 0.07) 44%, rgba(12, 17, 29, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.115);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.09), 0 18px 48px rgba(2, 4, 10, 0.14);
+  backdrop-filter: blur(22px) saturate(120%);
+}
+
+.console-filter-tab[data-active="true"] {
+  background: linear-gradient(142deg, rgba(248, 246, 243, 0.24), rgba(208, 213, 232, 0.1));
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 6px 22px rgba(8, 10, 18, 0.19);
+}
+
+.console-game-art {
+  --console-game-height: clamp(222px, 16.9vw, 338px);
+  width: clamp(158px, 12vw, 240px);
+  height: var(--console-game-height);
+  background: linear-gradient(145deg, #514b55, #101722);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.console-game-art[data-selected="true"] {
+  height: calc(var(--console-game-height) + 22px);
+  box-shadow: 0 0 0 2px rgba(253, 251, 248, 0.95), 0 0 0 6px rgba(246, 235, 223, 0.15);
+}
+
+.console-carousel-arrow {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.9);
+  transition: background-color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+}
+
+.console-carousel-arrow:hover:not(:disabled),
+.console-carousel-arrow:focus-visible {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.console-carousel-arrow:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.console-carousel-arrow:not(:disabled) { cursor: pointer; }
+.console-carousel-arrow:disabled { cursor: default; opacity: 0.32; pointer-events: none; }
+
+@media (max-width: 640px) {
+  .console-game-art { --console-game-height: 211px; width: 150px; }
+}
