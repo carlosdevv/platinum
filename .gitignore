@@ -66,6 +66,12 @@ next-env.d.ts
 # Vercel
 .vercel
 
+# Local AI assistant skills and installer lockfile
+.agents/
+.claude/skills/
+.windsurf/skills/
+skills-lock.json
+
 # PWA
 **/public/sw.js
 **/public/workbox-*.js
