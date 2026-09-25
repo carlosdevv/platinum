@@ -1,7 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { steamPosterUrl } from "@/lib/game-artwork";
+import { auth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const searchQuery = request.nextUrl.searchParams.get("game");
 
   if (!searchQuery) {

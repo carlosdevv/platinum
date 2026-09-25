@@ -1,19 +1,35 @@
+import type { GameFilter } from "@/context/useGameContext";
+
 export type MenuItensProps = {
-  id: string;
+  id: GameFilter;
   name: string;
+  tooltip: string;
 };
 
 export const menuItens: MenuItensProps[] = [
   {
-    id: "all",
-    name: "All",
+    id: "platinados",
+    name: "Platinados",
+    tooltip: "Mostrar jogos platinados",
   },
   {
-    id: "ps5",
-    name: "PS5",
+    id: "todos",
+    name: "Todos",
+    tooltip: "Mostrar todos os jogos já jogados",
+  },
+  {
+    id: "console",
+    name: "Console",
+    tooltip: "Mostrar jogos do console",
+  },
+  {
+    id: "outro",
+    name: "Outro",
+    tooltip: "Mostrar jogos de outras plataformas",
   },
   {
     id: "pc",
     name: "PC",
+    tooltip: "Mostrar jogos do PC",
   },
 ];

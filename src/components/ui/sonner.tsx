@@ -8,18 +8,23 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       className="toaster group"
+      theme="dark"
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-gray-800/80 group-[.toaster]:backdrop-blur-xl group-[.toaster]:border group-[.toaster]:border-gray-600/30 group-[.toaster]:text-white group-[.toaster]:shadow-2xl group-[.toaster]:rounded-xl group-[.toaster]:p-4 group-[.toaster]:min-w-[350px]",
-          description: "group-[.toast]:text-gray-300 group-[.toast]:text-sm",
+            "!border !border-white/12 !bg-[#111216]/95 !text-white !shadow-2xl !shadow-black/40 !backdrop-blur-2xl !rounded-xl !p-4 !min-w-[min(350px,calc(100vw-2rem))]",
+          title: "!text-white",
+          description: "!text-gray-300 !text-sm",
+          closeButton: "!border-white/15 !bg-white/5 !text-white/70 hover:!bg-white/10 hover:!text-white",
           actionButton:
-            "group-[.toast]:bg-gray-700/50 group-[.toast]:text-gray-200 group-[.toast]:border group-[.toast]:border-gray-500/30 group-[.toast]:hover:bg-gray-600/50 group-[.toast]:transition-all group-[.toast]:duration-300 group-[.toast]:rounded-lg group-[.toast]:px-3 group-[.toast]:py-1 group-[.toast]:text-xs group-[.toast]:font-medium",
+            "!bg-white/10 !text-gray-200 !border !border-white/15 hover:!bg-white/15 !transition-all !duration-300 !rounded-lg !px-3 !py-1 !text-xs !font-medium",
           cancelButton:
-            "group-[.toast]:bg-gray-700/50 group-[.toast]:text-gray-200 group-[.toast]:border group-[.toast]:border-gray-500/30 group-[.toast]:hover:bg-gray-600/50 group-[.toast]:transition-all group-[.toast]:duration-300 group-[.toast]:rounded-lg group-[.toast]:px-3 group-[.toast]:py-1 group-[.toast]:text-xs group-[.toast]:font-medium",
+            "!bg-white/10 !text-gray-200 !border !border-white/15 hover:!bg-white/15 !transition-all !duration-300 !rounded-lg !px-3 !py-1 !text-xs !font-medium",
         },
       }}
-      position="bottom-right"
+      position="top-center"
+      offset={{ top: 20 }}
+      mobileOffset={{ top: 12 }}
       richColors={false}
       closeButton
       duration={4000}

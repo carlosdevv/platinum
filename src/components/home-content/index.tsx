@@ -1,12 +1,9 @@
 "use client";
 
 import { Menu } from "@/components/menu";
-import { SkeletonMenu } from "@/components/skeletons/skeleton-menu";
-import { useGameContext } from "@/context/useGameContext";
+import { SteamOnboarding } from "@/components/steam-onboarding";
 
 export function HomeContent() {
-  const { isLoadingDbGames } = useGameContext();
-
   return (
     <div className="flex flex-col gap-7 pt-[clamp(3.5rem,10vh,8rem)] sm:gap-9">
       <div>
@@ -18,9 +15,9 @@ export function HomeContent() {
         </h1>
       </div>
 
-      <div className="px-8 sm:px-10">
-        {isLoadingDbGames ? <SkeletonMenu /> : <Menu />}
-      </div>
+      <SteamOnboarding />
+
+      <div><Menu /></div>
     </div>
   );
 }

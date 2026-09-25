@@ -3,20 +3,20 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 const publicRoutes = ["/login"];
-const publicApiRoutes = ["/api/steam", "/api/games", "/api/auth"];
 
 export async function proxy(req: NextRequest) {
   const token = await getToken({ req });
   const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname);
-  const isPublicApiRoute = publicApiRoutes.some(route => req.nextUrl.pathname.startsWith(route));
+  const isApiRoute = req.nextUrl.pathname.startsWith("/api/");
   const isAuthCallback = req.nextUrl.pathname.startsWith("/api/auth");
 
   if (isAuthCallback) {
     return NextResponse.next();
   }
 
-  // Permitir APIs públicas sem autenticação
-  if (isPublicApiRoute) {
+  // API requests need a JSON 401 from their route handlers. Redirecting them
+  // to /login returns HTML to fetch() callers and hides the expired session.
+  if (isApiRoute) {
     return NextResponse.next();
   }
 

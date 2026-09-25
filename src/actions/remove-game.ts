@@ -1,24 +1,26 @@
 "use server";
 
 import prisma from "@/lib/prismadb";
+import { auth } from "@/lib/auth";
 
 interface RemoveGameParams {
   name: string;
-  userId: string;
 }
 
 export async function removeGame(params: RemoveGameParams) {
-  const { name, userId } = params;
+  const { name } = params;
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
 
-  if (!name || !userId) {
-    throw new Error("Name and userId are required");
+  if (!name) {
+    throw new Error("Name is required");
   }
 
   try {
     const game = await prisma.game.findFirst({
       where: {
         name,
-        userId,
+        userId: session.user.id,
       },
     });
 

@@ -4,11 +4,12 @@ import { useGameContext } from "@/context/useGameContext";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { menuItens } from "./itens";
+import type { GameFilter } from "@/context/useGameContext";
 
 export function Menu() {
-  const { menuSelected, setMenuSelected, setGameSelected } = useGameContext();
+  const { menuSelected, setMenuSelected, setGameSelected, isFetchingDbGames, availableTags, selectedTagId, setSelectedTagId } = useGameContext();
 
-  const updateMenuSelection = (selectedId: string) => {
+  const updateMenuSelection = (selectedId: GameFilter) => {
     setMenuSelected(selectedId);
     setGameSelected(0);
   };
@@ -21,11 +22,13 @@ export function Menu() {
 
   return (
     <nav aria-label="Filtros da biblioteca" className="max-w-full">
+      <div className="flex max-w-full flex-wrap items-center gap-2">
       <div className="console-filter-bar inline-flex max-w-full items-center gap-1.5 rounded-2xl p-1.5 sm:gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
+              disabled={isFetchingDbGames}
               aria-label="Filtro anterior"
               onClick={() => cycleFilter(-1)}
               className="flex h-10 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-black/15 text-xs font-semibold tracking-wider text-white/70 transition-colors hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -42,6 +45,7 @@ export function Menu() {
               <TooltipTrigger asChild>
                 <button
                   type="button"
+                  disabled={isFetchingDbGames}
                   role="tab"
                   aria-selected={item.id === menuSelected}
                   aria-controls="game-library"
@@ -70,7 +74,7 @@ export function Menu() {
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                {item.id === "all" ? "Mostrar todos os jogos" : `Mostrar jogos do ${item.id === "pc" ? "PC" : "PS5"}`}
+                {item.tooltip}
               </TooltipContent>
             </Tooltip>
           ))}
@@ -80,6 +84,7 @@ export function Menu() {
           <TooltipTrigger asChild>
             <button
               type="button"
+              disabled={isFetchingDbGames}
               aria-label="Próximo filtro"
               onClick={() => cycleFilter(1)}
               className="flex h-10 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-black/15 text-xs font-semibold tracking-wider text-white/70 transition-colors hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -89,6 +94,16 @@ export function Menu() {
           </TooltipTrigger>
           <TooltipContent>Próximo filtro</TooltipContent>
         </Tooltip>
+      </div>
+      {availableTags.length > 0 && (
+        <label className="flex h-11 items-center gap-2 rounded-xl border border-white/12 bg-black/15 px-3 text-xs text-white/55">
+          <span>Tag</span>
+          <select value={selectedTagId ?? ""} onChange={(event) => setSelectedTagId(event.target.value || null)} className="max-w-40 cursor-pointer bg-transparent text-sm text-white outline-none">
+            <option value="" className="bg-[#111216]">Todas</option>
+            {availableTags.map((tag) => <option key={tag.id} value={tag.id} className="bg-[#111216]">{tag.name}</option>)}
+          </select>
+        </label>
+      )}
       </div>
     </nav>
   );

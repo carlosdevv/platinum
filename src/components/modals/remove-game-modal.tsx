@@ -14,6 +14,7 @@ import { useGameContext } from "@/context/useGameContext";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { fetchWithSession } from "@/lib/client-auth-fetch";
 
 export function RemoveGameModal() {
   const [isOpen, setIsOpen] = useQueryState("remove-game-modal", parseAsBoolean.withDefault(false));
@@ -27,26 +28,26 @@ export function RemoveGameModal() {
 
     setIsRemoving(true);
     try {
-      const response = await fetch("/api/games", {
+      const response = await fetchWithSession("/api/games", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: currentGame.name }),
+        body: JSON.stringify({ id: currentGame.id }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to remove game");
+        throw new Error("Não foi possível excluir o jogo.");
       }
 
-      toast.success(`${currentGame.name} was removed successfully!`);
+      toast.success(`${currentGame.name} foi excluído da biblioteca.`);
       setIsOpen(false);
       
       // Refresh games data
-      await fetchDbGames();
+      await fetchDbGames({ force: true });
     } catch (error) {
       console.error("Error removing game:", error);
-      toast.error("Error removing game");
+      toast.error(error instanceof Error ? error.message : "Não foi possível excluir o jogo.");
     } finally {
       setIsRemoving(false);
     }
@@ -62,23 +63,20 @@ export function RemoveGameModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md ps5-card border-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl">
-        <DialogHeader>
-          <DialogTitle className="text-white ps5-text-glow text-xl font-semibold flex items-center gap-3">
-            <Icons.Trash2 className="text-red-400 size-5" />
-            Remove Game
-          </DialogTitle>
-          <DialogDescription className="text-gray-300">
-            Are you sure you want to remove this game from your library?
+      <DialogContent variant="glass" className="max-w-md">
+        <DialogHeader className="px-4 pt-4">
+          <DialogTitle className="text-xl font-light text-white">Excluir jogo</DialogTitle>
+          <DialogDescription className="text-white/60">
+            Quer mesmo remover este jogo da sua biblioteca?
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600">
+        <div className="mx-4 mt-4 flex items-center gap-4 rounded-lg border border-white/10 bg-white/5 p-4">
           {currentGame.iconUrl && (
             <img
               src={currentGame.iconUrl}
               alt={currentGame.name}
-              className="w-16 h-16 rounded object-cover"
+              className="size-16 rounded object-cover"
             />
           )}
           <div className="flex-1">
@@ -89,28 +87,28 @@ export function RemoveGameModal() {
           </div>
         </div>
 
-        <DialogFooter className="flex gap-3">
+        <DialogFooter className="flex gap-3 px-4 pb-4 pt-4">
           <Button
             onClick={onClose}
             disabled={isRemoving}
-            className="bg-gray-500/20 backdrop-blur-md border border-gray-400/30 hover:bg-gray-500/30 transition-all duration-300 text-gray-300 font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-3 text-white/70 backdrop-blur-md hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             onClick={handleRemoveGame}
             disabled={isRemoving}
-            className="bg-red-500/20 backdrop-blur-md border border-red-400/30 hover:bg-red-500/30 transition-all duration-300 text-red-300 font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer gap-1 rounded-lg border border-red-300/20 bg-red-400/10 px-3 text-red-100 backdrop-blur-md hover:bg-red-400/15 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRemoving ? (
               <>
-                <Icons.Loader className="size-4 animate-spin mr-2" />
-                Removing...
+                <Icons.Loader className="size-4 animate-spin" />
+                Excluindo...
               </>
             ) : (
               <>
-                <Icons.Trash2 className="size-4 mr-2" />
-                Remove Game
+                <Icons.Trash2 className="size-4" />
+                Excluir jogo
               </>
             )}
           </Button>
@@ -118,4 +116,4 @@ export function RemoveGameModal() {
       </DialogContent>
     </Dialog>
   );
-} 
+}

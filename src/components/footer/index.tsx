@@ -7,15 +7,17 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect } from "react";
 
 export function Footer() {
-  const { isLoadingDbGames, gameSelected, gamesByMenu, hasGames } = useGameContext();
+  const { isLoadingDbGames, isFetchingDbGames, gameSelected, gamesByMenu, hasGames } = useGameContext();
   const [, setRemoveModalOpen] = useQueryState("remove-game-modal", parseAsBoolean.withDefault(false));
   const [, setUpdateModalOpen] = useQueryState("update-game-modal", parseAsBoolean.withDefault(false));
   const [, setAddModalOpen] = useQueryState("add-game-modal", parseAsBoolean.withDefault(false));
   const [, setSearchModalOpen] = useQueryState("search-game-modal", parseAsBoolean.withDefault(false));
 
   const isLoading = isLoadingDbGames;
+  const isActionsDisabled = isLoadingDbGames || isFetchingDbGames;
   const currentGame = gamesByMenu[gameSelected];
-  const isDbGame = currentGame && 'id' in currentGame;
+  const isDbGame = Boolean(currentGame && 'id' in currentGame);
+  const showGameActions = isLoadingDbGames || Boolean(isDbGame && hasGames);
 
   useEffect(() => {
     if (isLoading) return;
@@ -68,30 +70,18 @@ export function Footer() {
     setSearchModalOpen(true);
   };
 
-  if (isLoading) {
-    return (
-      <footer className="sticky bottom-0 z-30 bg-transparent py-6">
-        <div className="flex items-center justify-center gap-8">
-          <div className="flex items-center gap-3 animate-pulse">
-            <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
-            <span className="text-gray-400 text-sm font-semibold">Carregando...</span>
-          </div>
-        </div>
-      </footer>
-    );
-  }
-
   return (
     <footer className="sticky bottom-0 z-30 bg-transparent px-4 py-4 sm:px-8">
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 lg:justify-end lg:pr-8">
         {/* Delete Game Button - Only show for database games */}
-        {isDbGame && (
+        {showGameActions && (
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={handleDeleteGame}
+                disabled={isActionsDisabled || !isDbGame || !hasGames}
                 aria-keyshortcuts="D"
-                className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105"
+                className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <span className="flex size-6 items-center justify-center rounded-full bg-white/50 shadow-lg">
                   <Icons.X className="size-4" />
@@ -105,13 +95,14 @@ export function Footer() {
         )}
 
         {/* Update Game Button - Only show for database games */}
-        {isDbGame && (
+        {showGameActions && (
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={handleUpdateGame}
+                disabled={isActionsDisabled || !isDbGame || !hasGames}
                 aria-keyshortcuts="E"
-                className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105"
+                className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <span className="flex size-6 items-center justify-center rounded-full bg-white/50 shadow-lg">
                   <Icons.Circle className="size-4" />
@@ -129,8 +120,9 @@ export function Footer() {
           <TooltipTrigger asChild>
             <button
               onClick={handleAddGame}
+              disabled={isActionsDisabled}
               aria-keyshortcuts="A"
-              className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105"
+              className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span className="flex size-6 items-center justify-center rounded-full bg-white/50 shadow-lg">
                 <Icons.Square className="size-4" />
@@ -147,17 +139,18 @@ export function Footer() {
           <TooltipTrigger asChild>
             <button
               onClick={handleSearchGame}
+              disabled={isActionsDisabled}
               aria-keyshortcuts="/"
-              className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105"
+              className="group inline-flex cursor-pointer items-center gap-2 transition-transform duration-300 hover:scale-105 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span className="flex size-6 items-center justify-center rounded-full bg-white/50 shadow-lg">
                 <Icons.Triangle className="size-4" />
               </span>
-              <span className="text-sm font-medium uppercase tracking-wider text-gray-50 ps5-text-glow">Buscar jogo</span>
+              <span className="text-sm font-medium uppercase tracking-wider text-gray-50 ps5-text-glow">Localizar jogo</span>
               <kbd className="inline-flex size-5 shrink-0 items-center justify-center rounded border border-white/15 text-center text-[0.65rem] font-medium leading-none text-white/60">/</kbd>
             </button>
           </TooltipTrigger>
-          <TooltipContent>Buscar jogos · tecla /</TooltipContent>
+          <TooltipContent>Localizar jogo já adicionado · tecla /</TooltipContent>
         </Tooltip>
       </div>
     </footer>

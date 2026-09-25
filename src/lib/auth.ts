@@ -21,18 +21,9 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account && user) {
-        token.accessToken = account.access_token as string;
-        token.refreshToken = account.refresh_token as string;
-        token.accessTokenExpires = account.expires_at as number;
-      }
-      return token;
-    },
     async session({ session, token }) {
       if (session?.user) {
         session.user.id = token.sub!;
-        session.user.accessToken = token.accessToken as string;
       }
       return session;
     },
